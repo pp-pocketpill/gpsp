@@ -142,7 +142,7 @@ s32 load_file(const char **wildcards, char *result)
   char *file_name;
   u32 file_name_length;
   u32 ext_pos = -1;
-  u32 chosen_file, chosen_dir;
+  //u32 chosen_file, chosen_dir;
   s32 return_value = 1;
   s32 current_file_selection;
   s32 current_file_scroll_value;
@@ -174,8 +174,8 @@ s32 load_file(const char **wildcards, char *result)
 
     num_files = 0;
     num_dirs = 0;
-    chosen_file = 0;
-    chosen_dir = 0;
+    //chosen_file = 0;
+    //chosen_dir = 0;
 
     getcwd(current_dir_name, MAX_PATH);
 
@@ -746,7 +746,7 @@ u32 gamepad_config_line_to_button[] =
 
 #endif
 
-#ifdef RPI_BUILD
+#if defined(RPI_BUILD) || defined(CHIP_BUILD)
 
 u32 gamepad_config_line_to_button[] =
  { 0, 2, 1, 3, 8, 9, 10, 11, 6, 7, 4, 5, 12, 13, 14, 15 };
@@ -1585,7 +1585,7 @@ u32 menu(u16 *original_screen)
 
 #endif
 
-#if defined(PC_BUILD) || defined(RPI_BUILD)
+#if defined(PC_BUILD) || defined(RPI_BUILD) || defined(CHIP_BUILD)
 
   menu_option_type gamepad_config_options[] =
   {

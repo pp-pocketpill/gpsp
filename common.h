@@ -274,4 +274,8 @@ typedef u32 fixed8_24;
   #include "raspberrypi/rpi.h"
 #endif
 
+#ifdef CHIP_BUILD
+  #include "chip/chip.h"
 #endif
+
+#endif	// COMMON_H
