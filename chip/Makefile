@@ -34,7 +34,7 @@ all:	$(BIN)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 main.o: CFLAGS += -marm
-cpu.o cpu_threaded.o: CFLAGS += -marm -Wno-unused-variable -Wno-unused-label -fprefetch-loop-arrays
+cpu.o cpu_threaded.o video.o: CFLAGS += -marm -Wno-unused-variable -Wno-unused-label -fprefetch-loop-arrays
 
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) $(LIBS) -o $(BIN)

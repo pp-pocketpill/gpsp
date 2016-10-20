@@ -68,7 +68,7 @@ void gpsp_plat_init(void)
 	}
 	
 	SDL_ShowCursor(0);
-	screen_scale = 2;
+	screen_scale = 1;
 }
 
 

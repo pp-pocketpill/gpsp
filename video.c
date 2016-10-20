@@ -3859,6 +3859,7 @@ void video_resolution_large()
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
 #else
   screen = SDL_SetVideoMode(480, 272, 16, 0);
+  printf("Setting resolution to 480x272\n");
   resolution_width = 480;
   resolution_height = 272;
 #endif
@@ -3895,6 +3896,8 @@ void video_resolution_small()
 #else
   screen = SDL_SetVideoMode(small_resolution_width * video_scale,
    small_resolution_height * video_scale, 16, 0);
+  printf("Setting resolution to %dx%d.\n",
+  	small_resolution_width * video_scale, small_resolution_height * video_scale);
 #endif
   resolution_width = small_resolution_width;
   resolution_height = small_resolution_height;
