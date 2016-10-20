@@ -829,7 +829,7 @@ void synchronize()
   {
 #if defined(PND_BUILD) || defined(RPI_BUILD)
     fb_wait_vsync();
-#elif !defined(GP2X_BUILD) // sleeping on GP2X is a bad idea
+#elif !defined(GP2X_BUILD) && !defined(CHIP_BUILD) // sleeping on GP2X is a bad idea
     delay_us((u64)virtual_frame_count * 50000 / 3 - new_ticks + 2);
 #endif
   }

@@ -66,6 +66,9 @@ void gpsp_plat_init(void)
 			SDL_GetError());
 		exit(2);
 	}
+	
+	SDL_ShowCursor(0);
+	screen_scale = 2;
 }
 
 
@@ -75,16 +78,3 @@ void gpsp_plat_quit(void)
 	SDL_Quit();
 }
 
-
-
-u32 gpsp_plat_joystick_read(void)
-{
-	return 0;
-}
-
-
-
-u32 gpsp_plat_buttons_to_cursor(u32 buttons)
-{
-	return 0;
-}
