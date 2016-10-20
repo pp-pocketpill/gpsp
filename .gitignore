@@ -6,6 +6,7 @@
 *.pc
 .deps/
 .libs/
+gpsp
 config.*
 configure
 autom4te.cache/
@@ -16,4 +17,4 @@ libtool
 install-sh
 depcomp
 aclocal.m4
-src/ump.h
+*.dump
