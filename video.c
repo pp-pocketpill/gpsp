@@ -21,6 +21,10 @@
 #define WANT_FONT_BITS
 #include "font.h"
 
+#ifdef CHIP_BUILD
+#include "arm/neon_scaler.h"
+#endif
+
 #ifdef PSP_BUILD
 
 #include <pspctrl.h>
@@ -121,14 +125,18 @@ static u16 *screen_pixels = NULL;
 #include "SDL_gp2x.h"
 SDL_Surface *hw_screen;
 #endif
-SDL_Surface *screen;
+#ifdef CHIP_BUILD
+SDL_Surface *hw_screen = NULL;
+#endif
+SDL_Surface *screen = NULL;
+
 const u32 video_scale = 1;
 
 #define get_screen_pixels()                                                   \
   ((u16 *)screen->pixels)                                                     \
 
 #define get_screen_pitch()                                                    \
-  (screen->pitch / 2)                                                         \
+  (screen->pitch >> 1)                                                         \
 
 #endif
 
@@ -3502,6 +3510,9 @@ void flip_screen()
     warm_cache_op_all(WOP_D_CLEAN);
     SDL_BlitSurface(screen, NULL, hw_screen, NULL);
   }
+#elif defined(CHIP_BUILD)
+	upscale_aspect(hw_screen->pixels, get_screen_pixels());
+	SDL_Flip(hw_screen);
 #else
   SDL_Flip(screen);
 #endif
@@ -3626,6 +3637,12 @@ void init_video()
    160 * video_scale, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
 
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
+#elif defined(CHIP_BUILD)
+	hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_FULLSCREEN | SDL_HWSURFACE);
+	printf("* init_video: Creating 240x160 surface\n");
+	if (screen)
+		SDL_FreeSurface(screen);
+	screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 240, 160, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
 #else
   screen = SDL_SetVideoMode(240 * video_scale, 160 * video_scale, 16, 0);
 #endif
@@ -3857,9 +3874,17 @@ void video_resolution_large()
   SDL_ShowCursor(0);
 
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
+#elif defined(CHIP_BUILD)
+	hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_FULLSCREEN);
+	printf("* video_resolution_large: Creating 320x240 surface\n");
+	if (screen)
+		SDL_FreeSurface(screen);
+  	screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+	resolution_width = 320;
+	resolution_height = 240;
 #else
-  screen = SDL_SetVideoMode(480, 272, 16, 0);
-  printf("Setting resolution to 480x272\n");
+  screen = SDL_SetVideoMode(480, 272, 16, SDL_FULLSCREEN);
+  printf("* video_resolution_large: Setting resolution to 480x272\n");
   resolution_width = 480;
   resolution_height = 272;
 #endif
@@ -3893,11 +3918,17 @@ void video_resolution_small()
   SDL_ShowCursor(0);
 
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
+#elif defined(CHIP_BUILD)
+	hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_FULLSCREEN);
+	printf("* video_resolution_small: Creating 320x240 surface\n");
+	if (screen)
+		SDL_FreeSurface(screen);
+	screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
 #else
   screen = SDL_SetVideoMode(small_resolution_width * video_scale,
    small_resolution_height * video_scale, 16, 0);
-  printf("Setting resolution to %dx%d.\n",
-  	small_resolution_width * video_scale, small_resolution_height * video_scale);
+  printf("* video_resolution_small: Setting resolution to (%d * %d)x(%d * %d).\n",
+  	small_resolution_width, video_scale, small_resolution_height, video_scale);
 #endif
   resolution_width = small_resolution_width;
   resolution_height = small_resolution_height;

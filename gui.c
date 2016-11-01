@@ -766,7 +766,7 @@ static const char *scale_options[] =
   "unscaled", "2x", "3x", "fullscreen"
 #elif defined(GP2X_BUILD)
   "unscaled 3:2", "scaled 3:2", "fullscreen", "scaled 3:2 (software)"
-#elif defined(RPI_BUILD)
+#elif defined(RPI_BUILD) || defined(CHIP_BUILD)
   "fullscreen"
 #else
   "unscaled 3:2"
