@@ -45,6 +45,12 @@ $(BIN): $(OBJS)
 clean:
 	rm -f *.o $(BIN) picorestore
 
+# Installation
+
+install: gpsp ../game_config.txt
+	cp gpsp /usr/games/
+	cp ../game_config.txt /usr/games/
+
 # ----------- release -----------
 
 rel: gpsp ../game_config.txt ../COPYING.DOC
