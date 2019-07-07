@@ -23,6 +23,7 @@
 void update_scanline();
 void update_screen();
 void init_video();
+void deinit_video();
 void video_resolution_large();
 void video_resolution_small();
 void print_string(const char *str, u16 fg_color, u16 bg_color,

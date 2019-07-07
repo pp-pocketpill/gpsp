@@ -18,6 +18,7 @@
  */
 
 #include "common.h"
+#include "menu.h"
 
 // Special thanks to psp298 for the analog->dpad code!
 
@@ -65,6 +66,7 @@ u32 button_repeat = 0;
 gui_action_type cursor_repeat = CURSOR_NONE;
 
 
+#if 0
 #ifdef PSP_BUILD
 
 u32 gamepad_config_map[16] =
@@ -553,6 +555,7 @@ void init_input()
 }
 
 #endif
+#endif //0
 
 
 #if defined(RPI_BUILD) || defined(CHIP_BUILD)
@@ -561,34 +564,34 @@ u32 key_map(SDLKey key_sym)
 {
   switch(key_sym)
   {
-    case SDLK_a:
+    case SDLK_m:
       return BUTTON_L;
 
-    case SDLK_s:
+    case SDLK_n:
       return BUTTON_R;
 
-    case SDLK_DOWN:
+    case SDLK_d:
       return BUTTON_DOWN;
 
-    case SDLK_UP:
+    case SDLK_u:
       return BUTTON_UP;
 
-    case SDLK_LEFT:
+    case SDLK_l:
       return BUTTON_LEFT;
 
-    case SDLK_RIGHT:
+    case SDLK_r:
       return BUTTON_RIGHT;
 
-    case SDLK_RETURN:
+    case SDLK_s:
       return BUTTON_START;
 
-    case SDLK_BACKSPACE:
+    case SDLK_k:
       return BUTTON_SELECT;
 
-    case SDLK_x:
+    case SDLK_b:
       return BUTTON_B;
 
-    case SDLK_z:
+    case SDLK_a:
       return BUTTON_A;
 
     default:
@@ -685,31 +688,31 @@ gui_action_type get_gui_input()
       {
         switch(event.key.keysym.sym)
         {
-          case SDLK_ESCAPE:
+          case SDLK_y:
             gui_action = CURSOR_EXIT;
             break;
 
-          case SDLK_DOWN:
+          case SDLK_d:
             gui_action = CURSOR_DOWN;
             break;
 
-          case SDLK_UP:
+          case SDLK_u:
             gui_action = CURSOR_UP;
             break;
 
-          case SDLK_LEFT:
+          case SDLK_l:
             gui_action = CURSOR_LEFT;
             break;
 
-          case SDLK_RIGHT:
+          case SDLK_r:
             gui_action = CURSOR_RIGHT;
             break;
 
-          case SDLK_RETURN:
+          case SDLK_a:
             gui_action = CURSOR_SELECT;
             break;
 
-          case SDLK_BACKSPACE:
+          case SDLK_b:
             gui_action = CURSOR_BACK;
             break;
 	 default:
@@ -778,7 +781,7 @@ u32 update_input()
 #ifdef PC_BUILD
         if(event.key.keysym.sym == SDLK_BACKSPACE)
 #else
-        if(event.key.keysym.sym == SDLK_F10)
+        if(event.key.keysym.sym == SDLK_y)
 #endif
         {
           u16 *screen_copy = copy_screen();
@@ -787,43 +790,18 @@ u32 update_input()
 
           return ret_val;
         }
-        else
-#ifdef PC_BUILD
-        if(event.key.keysym.sym == SDLK_F1)
+        /// --- Menu ---
+        if(event.key.keysym.sym == SDLK_q)
         {
-          debug_on();
+          printf("Launching Menu\n");
+          run_menu_loop();
+          printf("Exit menu\n");
+          return 1;
         }
-        else
-
-        if(event.key.keysym.sym == SDLK_F2)
+        /// --- Quick save ---
+        else if(event.key.keysym.sym == SDLK_p)
         {
-          FILE *fp = fopen("palette_ram.bin", "wb");
-          printf("writing palette RAM\n");
-          fwrite(palette_ram, 1024, 1, fp);
-          fclose(fp);
-          printf("writing palette VRAM\n");
-          fp = fopen("vram.bin", "wb");
-          fwrite(vram, 1024 * 96, 1, fp);
-          fclose(fp);
-          printf("writing palette OAM RAM\n");
-          fp = fopen("oam_ram.bin", "wb");
-          fwrite(oam_ram, 1024, 1, fp);
-          fclose(fp);
-          printf("writing palette I/O registers\n");
-          fp = fopen("io_registers.bin", "wb");
-          fwrite(io_registers, 1024, 1, fp);
-          fclose(fp);
-        }
-        else
-
-        if(event.key.keysym.sym == SDLK_F3)
-        {
-          dump_translation_cache();
-        }
-        else
-#endif
-        if(event.key.keysym.sym == SDLK_F5)
-        {
+          printf("Quick save in slot %d\n", savestate_slot);
           char current_savestate_filename[512];
           u16 *current_screen = copy_screen();
           get_savestate_filename_noshot(savestate_slot,
@@ -831,10 +809,10 @@ u32 update_input()
           save_state(current_savestate_filename, current_screen);
           free(current_screen);
         }
-        else
-
-        if(event.key.keysym.sym == SDLK_F7)
+        /// --- Quick load ---
+        else if(event.key.keysym.sym == SDLK_F7)
         {
+          printf("Quick load from slot %d\n", savestate_slot);
           char current_savestate_filename[512];
           get_savestate_filename_noshot(savestate_slot,
            current_savestate_filename);
@@ -842,9 +820,42 @@ u32 update_input()
           debug_on();
           return 1;
         }
-        else
-
-        if(event.key.keysym.sym == SDLK_BACKQUOTE)
+        /// --- Volume Up ---
+        else if(event.key.keysym.sym == SDLK_c)
+        {
+          printf("Volume Up\n");
+        }
+        /// --- Volume Down ---
+        else if(event.key.keysym.sym == SDLK_e)
+        {
+          printf("Volume Down\n");
+        }
+        /// --- Brightness Up ---
+        else if(event.key.keysym.sym == SDLK_w)
+        {
+          printf("Brightness Up\n");
+        }
+        /// --- Brightness Down ---
+        else if(event.key.keysym.sym == SDLK_g)
+        {
+          printf("Brightness Down\n");
+        }
+        /// --- Aspect ratio decrease ---
+        else if(event.key.keysym.sym == SDLK_j)
+        {
+          printf("Aspect ratio decrease\n");
+        }
+        /// --- Aspect ratio increase ---
+        else if(event.key.keysym.sym == SDLK_i)
+        {
+          printf("Aspect ratio increase\n");
+        }
+        /// --- Change display mode ---
+        else if(event.key.keysym.sym == SDLK_h)
+        {
+          printf("Change display mode\n");
+        }
+        else if(event.key.keysym.sym == SDLK_BACKQUOTE)
         {
           synchronize_flag ^= 1;
         }

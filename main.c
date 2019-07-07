@@ -18,6 +18,7 @@
  */
 
 #include "common.h"
+#include "menu.h"
 
 #ifdef PSP_BUILD
 
@@ -257,6 +258,11 @@ int main(int argc, char *argv[])
 
   init_video();
 
+  /// --- Init menu ---
+  init_menu_SDL();
+  init_menu_zones();
+  init_menu_system_values();
+
   sprintf(bios_filename, "%s" PATH_SEPARATOR "%s", main_path, "gba_bios.bin");
   ret = load_bios(bios_filename);
   if (ret != 0)
@@ -337,7 +343,6 @@ int main(int argc, char *argv[])
       exit(-1);
     }
 
-    set_gba_resolution(screen_scale);
     video_resolution_small();
 
     init_cpu();
@@ -362,7 +367,6 @@ int main(int argc, char *argv[])
       }
 
       set_clock_speed();
-      set_gba_resolution(screen_scale);
       video_resolution_small();
 
       init_cpu();
@@ -898,11 +902,14 @@ void quit()
 #ifdef PSP_BUILD
   sceKernelExitGame();
 #else
-  SDL_Quit();
 
 #ifndef PC_BUILD
+  deinit_menu_SDL();
+  deinit_video();
   gpsp_plat_quit();
 #endif
+
+  SDL_Quit();
 
   exit(0);
 #endif

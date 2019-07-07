@@ -17,9 +17,11 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <SDL/SDL_ttf.h>
 #include "common.h"
 #define WANT_FONT_BITS
 #include "font.h"
+#include "menu.h"
 
 #ifdef CHIP_BUILD
 #include "arm/neon_scaler.h"
@@ -48,6 +50,9 @@ static u32 __attribute__((aligned(16))) display_list[32];
 
 #define GBA_SCREEN_WIDTH 240
 #define GBA_SCREEN_HEIGHT 160
+
+#define RES_HW_SCREEN_HORIZONTAL  240
+#define RES_HW_SCREEN_VERTICAL    240
 
 #define PSP_SCREEN_WIDTH 480
 #define PSP_SCREEN_HEIGHT 272
@@ -127,6 +132,12 @@ SDL_Surface *hw_screen;
 #endif
 #ifdef CHIP_BUILD
 SDL_Surface *hw_screen = NULL;
+
+#define GBA_SCREEN_WIDTH 240
+#define GBA_SCREEN_HEIGHT 160
+
+#define RES_HW_SCREEN_HORIZONTAL  240
+#define RES_HW_SCREEN_VERTICAL    240
 #endif
 SDL_Surface *screen = NULL;
 
@@ -3435,11 +3446,174 @@ void flip_screen()
       current_scanline_ptr[x2 - 2] = current_scanline_ptr[x];                 \
     }                                                                         \
     current_scanline_ptr += pitch;                                            \
-  }                                                                           \
+  }
+
+
+// Nearest neighboor with possible out of screen coordinates (for cropping)
+void flip_NN_AllowOutOfScreen(SDL_Surface *virtual_screen, SDL_Surface *hardware_screen, int new_w, int new_h){
+  int w2=new_w;
+  int h2=new_h;
+  int x_ratio = (int)((virtual_screen->w<<16)/w2) +1;
+  int y_ratio = (int)((virtual_screen->h<<16)/h2) +1;
+  //int x_ratio = (int)((w1<<16)/w2) ;
+  //int y_ratio = (int)((h1<<16)/h2) ;
+  //printf("virtual_screen->w=%d, virtual_screen->h=%d\n", virtual_screen->w, virtual_screen->h);
+  int x2, y2 ;
+
+  /// --- Compute padding for centering when out of bounds ---
+  int x_padding = 0;
+  if(w2>RES_HW_SCREEN_HORIZONTAL){
+    x_padding = (w2-RES_HW_SCREEN_HORIZONTAL)/2 + 1;
+  }
+
+  for (int i=0;i<h2;i++) {
+    if(i>=RES_HW_SCREEN_VERTICAL){
+      continue;
+    }
+    //printf("\n\ny=%d\n", i);
+    for (int j=0;j<w2;j++) {
+      if(j>=RES_HW_SCREEN_HORIZONTAL){
+        continue;
+      }
+      //printf("x=%d, ",j);
+      x2 = ((j*x_ratio)>>16) ;
+      y2 = ((i*y_ratio)>>16) ;
+
+      //printf("y=%d, x=%d, y2=%d, x2=%d, (y2*virtual_screen->w)+x2=%d\n", i, j, y2, x2, (y2*virtual_screen->w)+x2);
+      *(uint16_t*)(hardware_screen->pixels+(i* ((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2 ) +j)*sizeof(uint16_t)) =
+      *(uint16_t*)(virtual_screen->pixels + ((y2*virtual_screen->w)+x2 + x_padding) *sizeof(uint16_t)) ;
+    }
+  }
+}
+
+
+/// Nearest neighbor with 2D bilinear and interpolation with left and right pixels, pseudo gaussian weighting
+void flip_NNOptimized_LeftAndRightBilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_screen, int new_w, int new_h){
+  int w1=virtual_screen->w;
+  int h1=virtual_screen->h;
+  int w2=new_w;
+  int h2=new_h;
+  int y_padding = (RES_HW_SCREEN_VERTICAL-new_h)/2;
+  //int x_ratio = (int)((w1<<16)/w2) +1;
+  //int y_ratio = (int)((h1<<16)/h2) +1;
+  int x_ratio = (int)((w1<<16)/w2);
+  int y_ratio = (int)((h1<<16)/h2);
+  int x1, y1;
+
+#ifdef BLACKER_BLACKS
+      /// Optimization for blacker blacks (our screen do not handle green value of 1 very well)
+      uint16_t green_mask = 0x07C0;
+#else
+      uint16_t green_mask = 0x07E0;
+#endif
+
+  /// --- Compute padding for centering when out of bounds ---
+  int x_padding = 0;
+  if(w2>RES_HW_SCREEN_HORIZONTAL){
+    x_padding = (w2-RES_HW_SCREEN_HORIZONTAL)/2 + 1;
+  }
+  int x_padding_ratio = x_padding*w1/w2;
+
+  /// --- Interp params ---
+  int px_diff_prev_x = 0;
+  int px_diff_next_x = 0;
+  uint32_t ponderation_factor;
+  uint16_t * cur_p;
+  uint16_t * cur_p_left;
+  uint16_t * cur_p_right;
+  uint32_t red_comp, green_comp, blue_comp;
+  //int cnt_interp = 0; int cnt_no_interp = 0;
+  //printf("virtual_screen->w=%d, virtual_screen->w=%d\n", virtual_screen->w, virtual_screen->h);
+
+  for (int i=0;i<h2;i++)
+  {
+    if(i>=RES_HW_SCREEN_VERTICAL){
+      continue;
+    }
+    uint16_t* t = (uint16_t*)(hardware_screen->pixels+( (i+y_padding)*((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2))*sizeof(uint16_t));
+    y1 = ((i*y_ratio)>>16);
+    uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y1*w1 + x_padding_ratio) *sizeof(uint16_t));
+    int rat = 0;
+    for (int j=0;j<w2;j++)
+    {
+      if(j>=RES_HW_SCREEN_HORIZONTAL){
+        continue;
+      }
+      // ------ current x value ------
+      x1 = (rat>>16);
+      px_diff_next_x = ((rat+x_ratio)>>16) - x1;
+
+      // ------ adapted bilinear with 3x3 gaussian blur -------
+      cur_p = p+x1;
+      if(px_diff_prev_x > 1 || px_diff_next_x > 1){
+        red_comp=((*cur_p)&0xF800) << 1;
+        green_comp=((*cur_p)&0x07E0) << 1;
+        blue_comp=((*cur_p)&0x001F) << 1;
+        ponderation_factor = 2;
+
+        // ---- Interpolate current and left ----
+        if(px_diff_prev_x > 1 && x1>0){
+          cur_p_left = p+x1-1;
+
+          red_comp += ((*cur_p_left)&0xF800);
+          green_comp += ((*cur_p_left)&0x07E0);
+          blue_comp += ((*cur_p_left)&0x001F);
+          ponderation_factor++;
+        }
+
+        // ---- Interpolate current and right ----
+        if(px_diff_next_x > 1 && x1+1<w1){
+          cur_p_right = p+x1+1;
+
+          red_comp += ((*cur_p_right)&0xF800);
+          green_comp += ((*cur_p_right)&0x07E0);
+          blue_comp += ((*cur_p_right)&0x001F);
+          ponderation_factor++;
+        }
+
+        /// --- Compute new px value ---
+        if(ponderation_factor==4){
+          red_comp = (red_comp >> 2)&0xF800;
+          green_comp = (green_comp >> 2)&green_mask;
+          blue_comp = (blue_comp >> 2)&0x001F;
+        }
+        else if(ponderation_factor==2){
+          red_comp = (red_comp >> 1)&0xF800;
+          green_comp = (green_comp >> 1)&green_mask;
+          blue_comp = (blue_comp >> 1)&0x001F;
+        }
+        else{
+          red_comp = (red_comp / ponderation_factor )&0xF800;
+          green_comp = (green_comp / ponderation_factor )&green_mask;
+          blue_comp = (blue_comp / ponderation_factor )&0x001F;
+        }
+
+        /// --- write pixel ---
+        *t++ = red_comp+green_comp+blue_comp;
+      }
+      else{
+        /// --- copy pixel ---
+#ifdef BLACKER_BLACKS
+        /// Optimization for blacker blacks (our screen do not handle green value of 1 very well)
+        *t++ = (*cur_p)&0xFFDF;
+#else
+        *t++ = (*cur_p);
+#endif
+      }
+
+      /// save number of pixels to interpolate
+      px_diff_prev_x = px_diff_next_x;
+
+      // ------ next pixel ------
+      rat += x_ratio;
+    }
+  }
+  //printf("cnt_interp = %d, int cnt_no_interp = %d\n", cnt_interp, cnt_no_interp);
+}
 
 void flip_screen()
 {
-  if((video_scale != 1) && (current_scale != unscaled))
+  /*if((video_scale != 1) && (current_scale != unscaled))
   {
     s32 x, y;
     s32 x2, y2;
@@ -3475,7 +3649,7 @@ void flip_screen()
         y2--;
       }
     }
-  }
+  }*/
 #ifdef GP2X_BUILD
   {
     if((resolution_width == small_resolution_width) &&
@@ -3511,7 +3685,13 @@ void flip_screen()
     SDL_BlitSurface(screen, NULL, hw_screen, NULL);
   }
 #elif defined(CHIP_BUILD)
-	upscale_aspect(hw_screen->pixels, get_screen_pixels());
+  if(screen->w > RES_HW_SCREEN_HORIZONTAL){
+    flip_NNOptimized_LeftAndRightBilinear(screen, hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+  }
+  else{
+    flip_NN_AllowOutOfScreen(screen, hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+  }
+
 	SDL_Flip(hw_screen);
 #else
   SDL_Flip(screen);
@@ -3627,6 +3807,12 @@ void init_video()
 {
   SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
 
+  if(TTF_Init())
+  {
+        fprintf(stderr, "Error TTF_Init: %s\n", TTF_GetError());
+        exit(EXIT_FAILURE);
+  }
+
 #ifdef GP2X_BUILD
   SDL_GP2X_AllowGfxMemory(NULL, 0);
 
@@ -3638,18 +3824,24 @@ void init_video()
 
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
 #elif defined(CHIP_BUILD)
-	hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_FULLSCREEN | SDL_HWSURFACE);
-	printf("* init_video: Creating 240x160 surface\n");
+	hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
+                                16, SDL_FULLSCREEN | SDL_HWSURFACE);
+	printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
 	if (screen)
 		SDL_FreeSurface(screen);
-	screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 240, 160, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+	screen = SDL_CreateRGBSurface(SDL_SWSURFACE, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
 #else
   screen = SDL_SetVideoMode(240 * video_scale, 160 * video_scale, 16, 0);
 #endif
   SDL_ShowCursor(0);
 }
-
 #endif
+
+void deinit_video()
+{
+  if (screen)
+    SDL_FreeSurface(screen);
+}
 
 video_scale_type screen_scale = scaled_aspect;
 video_scale_type current_scale = scaled_aspect;
@@ -3875,11 +4067,13 @@ void video_resolution_large()
 
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
 #elif defined(CHIP_BUILD)
-	hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_FULLSCREEN);
-	printf("* video_resolution_large: Creating 320x240 surface\n");
-	if (screen)
-		SDL_FreeSurface(screen);
-  	screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+  hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
+                                16, SDL_FULLSCREEN | SDL_HWSURFACE);
+  printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+  if (screen)
+    SDL_FreeSurface(screen);
+  screen = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 240, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+  printf("* video_resolution_large: Creating 320x240 surface\n");
 	resolution_width = 320;
 	resolution_height = 240;
 #else
@@ -3919,19 +4113,21 @@ void video_resolution_small()
 
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
 #elif defined(CHIP_BUILD)
-	hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_FULLSCREEN);
-	printf("* video_resolution_small: Creating 320x240 surface\n");
+	hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
+                                16, SDL_FULLSCREEN | SDL_HWSURFACE);
+  printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
 	if (screen)
 		SDL_FreeSurface(screen);
-	screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+	screen = SDL_CreateRGBSurface(SDL_SWSURFACE, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+  printf("* video_resolution_small: Creating 240x160 surface\n");
 #else
   screen = SDL_SetVideoMode(small_resolution_width * video_scale,
    small_resolution_height * video_scale, 16, 0);
   printf("* video_resolution_small: Setting resolution to (%d * %d)x(%d * %d).\n",
   	small_resolution_width, video_scale, small_resolution_height, video_scale);
 #endif
-  resolution_width = small_resolution_width;
-  resolution_height = small_resolution_height;
+  resolution_width = GBA_SCREEN_WIDTH;
+  resolution_height = GBA_SCREEN_HEIGHT;
 }
 
 void set_gba_resolution(video_scale_type scale)

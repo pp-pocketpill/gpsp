@@ -6,7 +6,7 @@
 
 CC        = $(CROSS_COMPILE)gcc
 
-OBJS      = chip.o main.o cpu.o memory.o video.o input.o sound.o gui.o \
+OBJS      = chip.o main.o menu.o cpu.o memory.o video.o input.o sound.o gui.o \
             cheats.o zip.o cpu_threaded.o arm_stub.o video_blend.o warm.o \
             upscale_aspect.o neon_scaler.o
 BIN       = gpsp
@@ -15,7 +15,7 @@ BIN       = gpsp
 
 VPATH      += .. ../arm ../gp2x
 CFLAGS     += -DARM_ARCH -DCHIP_BUILD -Wall
-CFLAGS     += -march=armv7-a -mtune=cortex-a8 -mfloat-abi=hard -mfpu=neon -ffast-math
+CFLAGS     += -march=armv7-a -mtune=cortex-a7 -mfloat-abi=hard -mfpu=neon -ffast-math
 CFLAGS     += -ggdb
 ifndef DEBUG
 CFLAGS     += -O3 -funsafe-math-optimizations -mvectorize-with-neon-quad -ftree-vectorize
@@ -24,6 +24,7 @@ endif
 # expecting to have PATH set up to get correct sdl-config first
 CFLAGS     += `sdl-config --cflags`
 LIBS       += `sdl-config --libs`
+LIBS       += -lSDL_ttf -lSDL_image
 LIBS       += -ldl -lpthread -lz
 
 # Compilation:
