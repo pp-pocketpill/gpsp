@@ -20,23 +20,32 @@
 #ifndef VIDEO_H
 #define VIDEO_H
 
+#define RES_HW_SCREEN_HORIZONTAL  240
+#define RES_HW_SCREEN_VERTICAL    240
+
 void update_scanline();
 void update_screen();
 void init_video();
 void deinit_video();
 void video_resolution_large();
 void video_resolution_small();
+void SDL_Rotate_270(SDL_Surface * hw_surface, SDL_Surface * virtual_hw_surface);
 void print_string(const char *str, u16 fg_color, u16 bg_color,
  u32 x, u32 y);
 void print_string_pad(const char *str, u16 fg_color, u16 bg_color,
  u32 x, u32 y, u32 pad);
-void print_string_ext(const char *str, u16 fg_color, u16 bg_color,
+/*void print_string_ext(const char *str, u16 fg_color, u16 bg_color,
  u32 x, u32 y, void *_dest_ptr, u32 pitch, u32 pad,
- u32 h_offset, u32 height);
+ u32 h_offset, u32 height);*/
+void print_string_ext(const char *str, SDL_Surface *screen_surface, u16 fg_color, u16 bg_color,
+ u32 x, u32 y, u32 pad, u32 h_offset, u32 height);
+int print_hud();
+void set_hud_msg(char *msg, int seconds_on_screen);
 void clear_screen(u16 color);
 void blit_to_screen(u16 *src, u32 w, u32 h, u32 x, u32 y);
 u16 *copy_screen();
 void flip_screen();
+void render_game();
 void video_write_mem_savestate(file_tag_type savestate_file);
 void video_read_savestate(file_tag_type savestate_file);
 
@@ -49,11 +58,16 @@ void debug_screen_newline(u32 count);
 void debug_screen_update();
 
 extern u32 frame_speed;
-
+extern int need_screen_cleared;
 extern u32 resolution_width, resolution_height;
 
 extern s32 affine_reference_x[2];
 extern s32 affine_reference_y[2];
+
+
+#define HUD_MSG_MAX_SIZE  128
+extern char hud_msg[HUD_MSG_MAX_SIZE];
+extern int hud_msg_secs_on_screen;
 
 typedef void (* tile_render_function)(u32 layer_number, u32 start, u32 end,
  void *dest_ptr);

@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "menu.h"
+#include "video.h"
 
 // Special thanks to psp298 for the analog->dpad code!
 
@@ -764,6 +765,9 @@ gui_action_type get_gui_input()
 u32 update_input()
 {
   SDL_Event event;
+  FILE *fp;
+  char shell_cmd[100];
+  char hud_msg[HUD_MSG_MAX_SIZE];
 
   while(SDL_PollEvent(&event))
   {
@@ -781,7 +785,7 @@ u32 update_input()
 #ifdef PC_BUILD
         if(event.key.keysym.sym == SDLK_BACKSPACE)
 #else
-        if(event.key.keysym.sym == SDLK_y)
+        if(event.key.keysym.sym == SDLK_F10)
 #endif
         {
           u16 *screen_copy = copy_screen();
@@ -808,6 +812,10 @@ u32 update_input()
            current_savestate_filename);
           save_state(current_savestate_filename, current_screen);
           free(current_screen);
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "SAVED IN SLOT %d", savestate_slot);
+          set_hud_msg(hud_msg, 4);
         }
         /// --- Quick load ---
         else if(event.key.keysym.sym == SDLK_F7)
@@ -818,42 +826,133 @@ u32 update_input()
            current_savestate_filename);
           load_state(current_savestate_filename);
           debug_on();
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "LOADED FROM SLOT %d", savestate_slot);
+          set_hud_msg(hud_msg, 4);
           return 1;
         }
         /// --- Volume Up ---
         else if(event.key.keysym.sym == SDLK_c)
         {
           printf("Volume Up\n");
+          /// ----- Compute new value -----
+          volume_percentage = (volume_percentage > 100 - STEP_CHANGE_VOLUME)?
+                                100:(volume_percentage+STEP_CHANGE_VOLUME);
+          /// ----- Shell cmd ----
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);                   
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "VOLUME %d%%", volume_percentage);
+          set_hud_msg(hud_msg, 4);
         }
         /// --- Volume Down ---
         else if(event.key.keysym.sym == SDLK_e)
         {
           printf("Volume Down\n");
+          /// ----- Compute new value -----
+          volume_percentage = (volume_percentage < STEP_CHANGE_VOLUME)?
+                                0:(volume_percentage-STEP_CHANGE_VOLUME);
+          /// ----- Shell cmd ----
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);                   
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "VOLUME %d%%", volume_percentage);
+          set_hud_msg(hud_msg, 4);
         }
         /// --- Brightness Up ---
-        else if(event.key.keysym.sym == SDLK_w)
-        {
-          printf("Brightness Up\n");
-        }
-        /// --- Brightness Down ---
         else if(event.key.keysym.sym == SDLK_g)
         {
+          printf("Brightness Up\n");
+          /// ----- System brightness change -----
+          brightness_percentage = (brightness_percentage > 100 - STEP_CHANGE_BRIGHTNESS)?
+                                    100:(brightness_percentage+STEP_CHANGE_BRIGHTNESS);
+          /// ----- Shell cmd ----
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);                   
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "BRIGHTNESS %d%%", brightness_percentage);
+          set_hud_msg(hud_msg, 4);
+        }
+        /// --- Brightness Down ---
+        else if(event.key.keysym.sym == SDLK_w)
+        {
           printf("Brightness Down\n");
+          /// ----- System brightness change -----
+          brightness_percentage = (brightness_percentage < STEP_CHANGE_BRIGHTNESS)?
+                                    0:(brightness_percentage-STEP_CHANGE_BRIGHTNESS);
+          /// ----- Shell cmd ----
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);                   
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "BRIGHTNESS %d%%", brightness_percentage);
+          set_hud_msg(hud_msg, 4);
         }
         /// --- Aspect ratio decrease ---
         else if(event.key.keysym.sym == SDLK_j)
         {
           printf("Aspect ratio decrease\n");
+          if(aspect_ratio == ASPECT_RATIOS_TYPE_MANUAL){
+            aspect_ratio_factor_percent = (aspect_ratio_factor_percent>aspect_ratio_factor_step)?
+                          aspect_ratio_factor_percent-aspect_ratio_factor_step:0;
+            need_screen_cleared = 1;
+          }
+          else{
+            aspect_ratio = ASPECT_RATIOS_TYPE_MANUAL;
+          }
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
+          set_hud_msg(hud_msg, 4);
         }
         /// --- Aspect ratio increase ---
         else if(event.key.keysym.sym == SDLK_i)
         {
           printf("Aspect ratio increase\n");
+          if(aspect_ratio == ASPECT_RATIOS_TYPE_MANUAL){
+            aspect_ratio_factor_percent = (aspect_ratio_factor_percent+aspect_ratio_factor_step<100)?
+                          aspect_ratio_factor_percent+aspect_ratio_factor_step:100;
+            need_screen_cleared = 1;
+          }
+          else{
+            aspect_ratio = ASPECT_RATIOS_TYPE_MANUAL;
+          }
+          aspect_ratio = ASPECT_RATIOS_TYPE_MANUAL;
+
+          /// ----- Hud Msg -----
+          sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
+          set_hud_msg(hud_msg, 4);
         }
         /// --- Change display mode ---
         else if(event.key.keysym.sym == SDLK_h)
         {
           printf("Change display mode\n");
+          aspect_ratio = (aspect_ratio+1)%NB_ASPECT_RATIOS_TYPES;
+
+          /// ----- Hud Msg -----
+          if(aspect_ratio == ASPECT_RATIOS_TYPE_MANUAL){
+            sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
+          }
+          else{
+            sprintf(hud_msg, "DISPLAY MODE: %s", aspect_ratio_name[aspect_ratio]);  
+          }
+          set_hud_msg(hud_msg, 4);
         }
         else if(event.key.keysym.sym == SDLK_BACKQUOTE)
         {

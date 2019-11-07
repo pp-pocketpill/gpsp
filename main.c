@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "menu.h"
+#include "video.h"
 
 #ifdef PSP_BUILD
 
@@ -648,16 +649,22 @@ u32 update_gba()
 
           update_gbc_sound(cpu_ticks);
 
-          if(fps_debug)
-          {
-            char print_buffer[32];
-            sprintf(print_buffer, "%2d (%2d)", fps, frames_drawn);
-            print_string(print_buffer, 0xFFFF, 0x000, 0, 0);
+          /// ------- Render -------
+          update_screen();
+
+          if(!print_hud()){
+            if(fps_debug)
+            {
+              char print_buffer[32];
+              sprintf(print_buffer, "%2d (%2d)", fps, frames_drawn);
+              print_string(print_buffer, 0xFFFF, 0x000, 0, 0);
+            }
           }
           if(!synchronize_flag)
             print_string("-FF-", 0xFFFF, 0x000, 216, 0);
 
-          update_screen();
+          flip_screen();
+          /// ----------------------
 
           synchronize();
 

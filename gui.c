@@ -110,6 +110,8 @@
   #define get_clock_speed_number()
 #endif
 
+extern SDL_Surface * virtual_hw_screen;
+
 
 int sort_function(const void *dest_str_ptr, const void *src_str_ptr)
 {
@@ -1079,8 +1081,9 @@ void get_savestate_snapshot(char *savestate_filename)
   else
   {
     memset(snapshot_buffer, 0, 240 * 160 * 2);
-    print_string_ext("No savestate in this slot.",
-     0xFFFF, 0x0000, 15, 75, snapshot_buffer, 240, 0, 0, FONT_HEIGHT);
+
+    print_string_ext("No savestate in this slot.", virtual_hw_screen, 0xFFFF, 0x0000,
+     15, 75, 0, 0, FONT_HEIGHT);
     print_string("---------- --/--/---- --:--:--          ", COLOR_HELP_TEXT,
      COLOR_BG, 10, 40);
   }
@@ -1687,8 +1690,8 @@ u32 menu(u16 *original_screen)
   {
     first_load = 1;
     memset(original_screen, 0x00, 240 * 160 * 2);
-    print_string_ext("No game loaded yet.", 0xFFFF, 0x0000,
-     60, 75,original_screen, 240, 0, 0, FONT_HEIGHT);
+    print_string_ext("No game loaded yet.", virtual_hw_screen, 0xFFFF, 0x0000,
+     60, 75, 0, 0, FONT_HEIGHT);
   }
 
   choose_menu(&main_menu);
