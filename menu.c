@@ -538,8 +538,11 @@ void menu_screen_refresh(int menuItem, int prevItem, int scroll, uint8_t menu_co
     }
 
     /// --------- Screen Rotate --------
-    SDL_Rotate_270(hw_screen, draw_screen);
+    //SDL_Rotate_270(hw_screen, draw_screen);
     //SDL_BlitSurface(draw_screen, NULL, hw_screen, NULL);
+
+	/// ---- Fast blit ----
+	memcpy(hw_screen->pixels, draw_screen->pixels, hw_screen->h*hw_screen->w*sizeof(uint16_t));
 
     /// --------- Render Screen ----------
     SDL_Flip(hw_screen);

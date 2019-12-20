@@ -3929,11 +3929,8 @@ void flip_screen()
 {
 	
   /// ---- Fast blit ----
-	//memcpy(hw_screen->pixels, virtual_hw_screen->pixels, hw_screen->h*hw_screen->w*sizeof(uint16_t));
+  memcpy(hw_screen->pixels, virtual_hw_screen->pixels, hw_screen->h*hw_screen->w*sizeof(uint16_t));
 	
-  /// ---- Rotation by 270 ----
-  SDL_Rotate_270(hw_screen, virtual_hw_screen);
-  
   SDL_Flip(hw_screen);
 }
 
