@@ -596,10 +596,10 @@ u32 key_map(SDLKey key_sym)
       return BUTTON_A;
 
     case SDLK_y:
-      return BUTTON_B;
+      return BUTTON_A;
 
     case SDLK_x:
-      return BUTTON_A;
+      return BUTTON_B;
 
     default:
       return BUTTON_NONE;
