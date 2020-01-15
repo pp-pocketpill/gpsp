@@ -261,8 +261,6 @@ int main(int argc, char *argv[])
 
   /// --- Init menu ---
   init_menu_SDL();
-  init_menu_zones();
-  init_menu_system_values();
 
   sprintf(bios_filename, "%s" PATH_SEPARATOR "%s", main_path, "gba_bios.bin");
   ret = load_bios(bios_filename);
