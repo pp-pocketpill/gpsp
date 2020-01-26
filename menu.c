@@ -812,8 +812,13 @@ void run_menu_loop()
                                 save_state(fname, current_screen);
 
                                 /// ----- Hud Msg -----
-                                sprintf(hud_msg, "SAVED IN SLOT %d", savestate_slot);
-                                set_hud_msg(hud_msg, 4);
+                                sprintf(shell_cmd, "%s %d \"        SAVED IN SLOT %d\"", 
+                                    SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
+                                fp = popen(shell_cmd, "r");
+                                if (fp == NULL) {
+                                    MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
+                                }
+
                                 stop_menu_loop = 1;
                             }
                             else{
@@ -834,8 +839,13 @@ void run_menu_loop()
                                 load_state(fname);
 
                                 /// ----- Hud Msg -----
-                                sprintf(hud_msg, "LOADED FROM SLOT %d", savestate_slot);
-                                set_hud_msg(hud_msg, 4);
+                                sprintf(shell_cmd, "%s %d \"      LOADED FROM SLOT %d\"", 
+                                    SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
+                                fp = popen(shell_cmd, "r");
+                                if (fp == NULL) {
+                                    MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
+                                }
+
                                 stop_menu_loop = 1;
                             }
                             else{
