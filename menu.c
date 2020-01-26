@@ -132,7 +132,7 @@ void init_menu_SDL(){
     /// ----- Copy hw_screen at init ------
     backup_hw_screen = SDL_CreateRGBSurface(SDL_SWSURFACE,
         virtual_hw_screen->w, virtual_hw_screen->h, 16, 0, 0, 0, 0);
-    
+
     draw_screen = SDL_CreateRGBSurface(SDL_SWSURFACE,
         virtual_hw_screen->w, virtual_hw_screen->h, 16, 0, 0, 0, 0);
     if(draw_screen == NULL){
@@ -812,7 +812,7 @@ void run_menu_loop()
                                 save_state(fname, current_screen);
 
                                 /// ----- Hud Msg -----
-                                sprintf(shell_cmd, "%s %d \"        SAVED IN SLOT %d\"", 
+                                sprintf(shell_cmd, "%s %d \"        SAVED IN SLOT %d\"",
                                     SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
                                 fp = popen(shell_cmd, "r");
                                 if (fp == NULL) {
@@ -839,7 +839,7 @@ void run_menu_loop()
                                 load_state(fname);
 
                                 /// ----- Hud Msg -----
-                                sprintf(shell_cmd, "%s %d \"      LOADED FROM SLOT %d\"", 
+                                sprintf(shell_cmd, "%s %d \"      LOADED FROM SLOT %d\"",
                                     SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
                                 fp = popen(shell_cmd, "r");
                                 if (fp == NULL) {

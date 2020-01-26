@@ -685,7 +685,7 @@ gui_action_type get_gui_input()
   delay_us(30000);
 
   while(SDL_PollEvent(&event))
-  { 
+  {
     switch(event.type)
     {
       case SDL_QUIT:
@@ -809,7 +809,8 @@ u32 update_input()
           return 1;
         }
         /// --- Quick save ---
-        else if(event.key.keysym.sym == SDLK_p)
+        //else if(event.key.keysym.sym == SDLK_p)
+        else if(event.key.keysym.sym == SDLK_F6)
         {
           printf("Quick save in slot %d\n", savestate_slot);
           char current_savestate_filename[512];
@@ -820,8 +821,14 @@ u32 update_input()
           free(current_screen);
 
           /// ----- Hud Msg -----
-          sprintf(hud_msg, "SAVED IN SLOT %d", savestate_slot);
-          set_hud_msg(hud_msg, 4);
+          /*sprintf(hud_msg, "SAVED IN SLOT %d", savestate_slot);
+          set_hud_msg(hud_msg, 4);*/
+          sprintf(shell_cmd, "%s %d \"        SAVED IN SLOT %d\"",
+            SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
         }
         /// --- Quick load ---
         else if(event.key.keysym.sym == SDLK_F7)
@@ -834,8 +841,14 @@ u32 update_input()
           debug_on();
 
           /// ----- Hud Msg -----
-          sprintf(hud_msg, "LOADED FROM SLOT %d", savestate_slot);
-          set_hud_msg(hud_msg, 4);
+          /*sprintf(hud_msg, "LOADED FROM SLOT %d", savestate_slot);
+          set_hud_msg(hud_msg, 4);*/
+          sprintf(shell_cmd, "%s %d \"      LOADED FROM SLOT %d\"",
+            SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
           return 1;
         }
         /// --- Volume Up ---
@@ -846,7 +859,7 @@ u32 update_input()
           volume_percentage = (volume_percentage > 100 - STEP_CHANGE_VOLUME)?
                                 100:(volume_percentage+STEP_CHANGE_VOLUME);
           /// ----- Shell cmd ----
-          sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);                   
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
@@ -864,7 +877,7 @@ u32 update_input()
           volume_percentage = (volume_percentage < STEP_CHANGE_VOLUME)?
                                 0:(volume_percentage-STEP_CHANGE_VOLUME);
           /// ----- Shell cmd ----
-          sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);                   
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
@@ -882,7 +895,7 @@ u32 update_input()
           brightness_percentage = (brightness_percentage > 100 - STEP_CHANGE_BRIGHTNESS)?
                                     100:(brightness_percentage+STEP_CHANGE_BRIGHTNESS);
           /// ----- Shell cmd ----
-          sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);                   
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
@@ -900,7 +913,7 @@ u32 update_input()
           brightness_percentage = (brightness_percentage < STEP_CHANGE_BRIGHTNESS)?
                                     0:(brightness_percentage-STEP_CHANGE_BRIGHTNESS);
           /// ----- Shell cmd ----
-          sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);                   
+          sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
@@ -919,13 +932,17 @@ u32 update_input()
                           aspect_ratio_factor_percent-aspect_ratio_factor_step:0;
             need_screen_cleared = 1;
           }
-          else{
-            aspect_ratio = ASPECT_RATIOS_TYPE_MANUAL;
-          }
+          aspect_ratio = ASPECT_RATIOS_TYPE_MANUAL;
 
           /// ----- Hud Msg -----
-          sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
-          set_hud_msg(hud_msg, 4);
+          /*sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
+          set_hud_msg(hud_msg, 4);*/
+          sprintf(shell_cmd, "%s %d \"DISPLAY MODE: MANUAL ZOOM %d%%%\"",
+            SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, aspect_ratio_factor_percent);
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
         }
         /// --- Aspect ratio increase ---
         else if(event.key.keysym.sym == SDLK_i)
@@ -936,14 +953,17 @@ u32 update_input()
                           aspect_ratio_factor_percent+aspect_ratio_factor_step:100;
             need_screen_cleared = 1;
           }
-          else{
-            aspect_ratio = ASPECT_RATIOS_TYPE_MANUAL;
-          }
           aspect_ratio = ASPECT_RATIOS_TYPE_MANUAL;
 
           /// ----- Hud Msg -----
-          sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
-          set_hud_msg(hud_msg, 4);
+          /*sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
+          set_hud_msg(hud_msg, 4);*/
+          sprintf(shell_cmd, "%s %d \"DISPLAY MODE: MANUAL ZOOM %d%%%\"",
+            SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, aspect_ratio_factor_percent);
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
         }
         /// --- Change display mode ---
         else if(event.key.keysym.sym == SDLK_h)
@@ -953,12 +973,20 @@ u32 update_input()
 
           /// ----- Hud Msg -----
           if(aspect_ratio == ASPECT_RATIOS_TYPE_MANUAL){
-            sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
+            //sprintf(hud_msg, "DISPLAY MODE: MANUAL ZOOM %d%%", aspect_ratio_factor_percent);
+            sprintf(shell_cmd, "%s %d \"DISPLAY MODE: MANUAL ZOOM %d%%%\"",
+              SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, aspect_ratio_factor_percent);
           }
           else{
-            sprintf(hud_msg, "DISPLAY MODE: %s", aspect_ratio_name[aspect_ratio]);  
+            //sprintf(hud_msg, "DISPLAY MODE: %s", aspect_ratio_name[aspect_ratio]);
+            sprintf(shell_cmd, "%s %d \"     DISPLAY MODE: %s\"",
+              SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, aspect_ratio_name[aspect_ratio]);
           }
-          set_hud_msg(hud_msg, 4);
+          //set_hud_msg(hud_msg, 4);
+          fp = popen(shell_cmd, "r");
+          if (fp == NULL) {
+            printf("Failed to run command %s\n", shell_cmd);
+          }
         }
         else if(event.key.keysym.sym == SDLK_BACKQUOTE)
         {
@@ -998,7 +1026,7 @@ u32 update_input()
             key &= ~(BUTTON_LEFT|BUTTON_RIGHT);
          if (event.jaxis.value < -3200)  key |= BUTTON_LEFT;
            else if (event.jaxis.value > 3200)  key |= BUTTON_RIGHT;
-       } 
+       }
          if (event.jaxis.axis==1) {  //Up-Down
             key &= ~(BUTTON_UP|BUTTON_DOWN);
          if (event.jaxis.value < -3200)  key |= BUTTON_UP;
