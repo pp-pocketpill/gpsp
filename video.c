@@ -27,6 +27,34 @@
 #include "arm/neon_scaler.h"
 #endif
 
+
+
+#define AVERAGE(z, x) ((((z) & 0xF7DEF7DE) >> 1) + (((x) & 0xF7DEF7DE) >> 1))
+#define AVERAGEHI(AB) ((((AB) & 0xF7DE0000) >> 1) + (((AB) & 0xF7DE) << 15))
+#define AVERAGELO(CD) ((((CD) & 0xF7DE) >> 1) + (((CD) & 0xF7DE0000) >> 17))
+
+// Support math
+#define Half(A) (((A) >> 1) & 0x7BEF)
+#define Quarter(A) (((A) >> 2) & 0x39E7)
+// Error correction expressions to piece back the lower bits together
+#define RestHalf(A) ((A) & 0x0821)
+#define RestQuarter(A) ((A) & 0x1863)
+
+// Error correction expressions for quarters of pixels
+#define Corr1_3(A, B)     Quarter(RestQuarter(A) + (RestHalf(B) << 1) + RestQuarter(B))
+#define Corr3_1(A, B)     Quarter((RestHalf(A) << 1) + RestQuarter(A) + RestQuarter(B))
+
+// Error correction expressions for halves
+#define Corr1_1(A, B)     ((A) & (B) & 0x0821)
+
+// Quarters
+#define Weight1_3(A, B)   (Quarter(A) + Half(B) + Quarter(B) + Corr1_3(A, B))
+#define Weight3_1(A, B)   (Half(A) + Quarter(A) + Quarter(B) + Corr3_1(A, B))
+
+// Halves
+#define Weight1_1(A, B)   (Half(A) + Half(B) + Corr1_1(A, B))
+
+
 #if 0
 #ifdef PSP_BUILD
 
@@ -3393,11 +3421,7 @@ void flip_NNOptimized_AllowOutOfScreen(SDL_Surface *virtual_screen, SDL_Surface 
         continue;
       }
       x2 = (rat>>16);
-#ifdef BLACKER_BLACKS
-      *t++ = p[x2] & 0xFFDF; /// Optimization for blacker blacks
-#else
-      *t++ = p[x2]; /// Optimization for blacker blacks
-#endif
+      *t++ = p[x2];
       rat += x_ratio;
       //printf("y=%d, x=%d, y2=%d, x2=%d, (y2*virtual_screen->w)+x2=%d\n", i, j, y2, x2, (y2*virtual_screen->w)+x2);
     } 
@@ -3418,12 +3442,7 @@ void flip_Upscaling_Bilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_
   int x, y ;
   //printf("virtual_screen->h=%d, h2=%d\n", virtual_screen->h, h2);
 
-#ifdef BLACKER_BLACKS
-      /// Optimization for blacker blacks (our screen do not handle green value of 1 very well)
-      uint16_t green_mask = 0x07C0; 
-#else
-      uint16_t green_mask = 0x07E0;
-#endif
+  uint16_t green_mask = 0x07E0;
 
   /// --- Compute padding for centering when out of bounds ---
   int y_padding = (RES_HW_SCREEN_VERTICAL-new_h)/2;
@@ -3452,11 +3471,7 @@ void flip_Upscaling_Bilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_
       }
       x = (rat>>16);
       x_diff = rat - (x<<16) ;
-/*#ifdef BLACKER_BLACKS
-      *t++ = p[x] & 0xFFDF; /// Optimization for blacker blacks
-#else
-      *t++ = p[x]; /// Optimization for blacker blacks
-#endif*/
+
       /// --- Getting adjacent pixels ---
       p_val_tl = p[x] ;
       p_val_tr = (x+1<w1)?p[x+1]:p[x];
@@ -3507,12 +3522,7 @@ void flip_Upscaling_Bilinear_Xonly(SDL_Surface *virtual_screen, SDL_Surface *har
   int x, y ;
   //printf("virtual_screen->h=%d, h2=%d\n", virtual_screen->h, h2);
 
-#ifdef BLACKER_BLACKS
-      /// Optimization for blacker blacks (our screen do not handle green value of 1 very well)
-      uint16_t green_mask = 0x07C0; 
-#else
-      uint16_t green_mask = 0x07E0;
-#endif
+  uint16_t green_mask = 0x07E0;
 
   /// --- Compute padding for centering when out of bounds ---
   int y_padding = (RES_HW_SCREEN_VERTICAL-new_h)/2;
@@ -3541,11 +3551,7 @@ void flip_Upscaling_Bilinear_Xonly(SDL_Surface *virtual_screen, SDL_Surface *har
       }
       x = (rat>>16);
       x_diff = rat - (x<<16) ;
-/*#ifdef BLACKER_BLACKS
-      *t++ = p[x] & 0xFFDF; /// Optimization for blacker blacks
-#else
-      *t++ = p[x]; /// Optimization for blacker blacks
-#endif*/
+
       /// --- Getting adjacent pixels ---
       p_val_tl = p[x] ;
       p_val_tr = (x+1<w1)?p[x+1]:p[x];
@@ -3588,12 +3594,7 @@ void flip_Upscaling_Bilinear_Yonly(SDL_Surface *virtual_screen, SDL_Surface *har
   int x, y ;
   //printf("virtual_screen->h=%d, h2=%d\n", virtual_screen->h, h2);
 
-#ifdef BLACKER_BLACKS
-      /// Optimization for blacker blacks (our screen do not handle green value of 1 very well)
-      uint16_t green_mask = 0x07C0; 
-#else
-      uint16_t green_mask = 0x07E0;
-#endif
+  uint16_t green_mask = 0x07E0;
 
   /// --- Compute padding for centering when out of bounds ---
   int y_padding = (RES_HW_SCREEN_VERTICAL-new_h)/2;
@@ -3622,11 +3623,7 @@ void flip_Upscaling_Bilinear_Yonly(SDL_Surface *virtual_screen, SDL_Surface *har
       }
       x = (rat>>16);
       x_diff = rat - (x<<16) ;
-/*#ifdef BLACKER_BLACKS
-      *t++ = p[x] & 0xFFDF; /// Optimization for blacker blacks
-#else
-      *t++ = p[x]; /// Optimization for blacker blacks
-#endif*/
+
       /// --- Getting adjacent pixels ---
       p_val_tl = p[x] ;
       p_val_bl = (y+1<h1)?p[x+w1]:p[x];
@@ -3669,12 +3666,7 @@ void flip_NNOptimized_LeftAndRightBilinear(SDL_Surface *virtual_screen, SDL_Surf
   int y_ratio = (int)((h1<<16)/h2);
   int x1, y1;
 
-#ifdef BLACKER_BLACKS
-      /// Optimization for blacker blacks (our screen do not handle green value of 1 very well)
-      uint16_t green_mask = 0x07C0;
-#else
-      uint16_t green_mask = 0x07E0;
-#endif
+  uint16_t green_mask = 0x07E0;
 
   /// --- Compute padding for centering when out of bounds ---
   int x_padding = 0;
@@ -3762,12 +3754,7 @@ void flip_NNOptimized_LeftAndRightBilinear(SDL_Surface *virtual_screen, SDL_Surf
       }
       else{
         /// --- copy pixel ---
-#ifdef BLACKER_BLACKS
-        /// Optimization for blacker blacks (our screen do not handle green value of 1 very well)
-        *t++ = (*cur_p)&0xFFDF;
-#else
         *t++ = (*cur_p);
-#endif
       }
 
       /// save number of pixels to interpolate
@@ -3778,6 +3765,51 @@ void flip_NNOptimized_LeftAndRightBilinear(SDL_Surface *virtual_screen, SDL_Surf
     }
   }
   //printf("cnt_interp = %d, int cnt_no_interp = %d\n", cnt_interp, cnt_no_interp);
+}
+
+
+void upscale_160x240_to_240x240_bilinearish(SDL_Surface *src_surface, SDL_Surface *dst_surface)
+{
+	if(src_surface->w != 240){
+		printf("src_surface->w (%d) != 240 \n", src_surface->w);
+		return;
+	}
+	if(src_surface->h != 160){
+		printf("src_surface->h (%d) != 160 \n", src_surface->h);
+		return;
+	}
+
+	uint16_t* Src16 = (uint16_t*) src_surface->pixels;
+	uint16_t* Dst16 = (uint16_t*) dst_surface->pixels;
+	// There are 80 blocks of 2 pixels vertically, and 240 of 1 horizontally.
+	// Each block of 2x1 becomes 3x1.
+	uint32_t BlockX, BlockY;
+	uint16_t* BlockSrc;
+	uint16_t* BlockDst;
+	for (BlockY = 0; BlockY < 80; BlockY++)
+	{
+		BlockSrc = Src16 + BlockY * 240 * 2;
+		BlockDst = Dst16 + BlockY * 240 * 3;
+		for (BlockX = 0; BlockX < 240; BlockX++)
+		{
+			/* Vertically:
+			 * Before(2):
+			 * (a)(b)
+			 * After(3):
+			 * (a)(ab)(b)
+			 */
+
+			// -- Column 1 --
+			uint16_t  _1 = *(BlockSrc               );
+			*(BlockDst               ) = _1;
+			uint16_t  _2 = *(BlockSrc            + 240*1);
+			*(BlockDst            + 240*1) = Weight1_1( _1,  _2);
+			*(BlockDst            + 240*2) = _2;
+
+			BlockSrc += 1;
+			BlockDst += 1;
+		}
+	}
 }
 
 
@@ -3848,9 +3880,11 @@ void render_game()
       flip_NNOptimized_LeftAndRightBilinear(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     }
     else{
-    	//flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
-      	flip_Upscaling_Bilinear_Yonly(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+	//flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+	//flip_Upscaling_Bilinear_Yonly(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+	upscale_160x240_to_240x240_bilinearish(screen, virtual_hw_screen);
     }
+    //flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     break;
 
     case ASPECT_RATIOS_TYPE_MANUAL:
