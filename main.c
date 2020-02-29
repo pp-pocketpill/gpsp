@@ -17,9 +17,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <signal.h>
 #include "common.h"
 #include "menu.h"
 #include "video.h"
+
+#define BIOS_PATH "/mnt/Game Boy Advance"
 
 #ifdef PSP_BUILD
 
@@ -91,6 +94,18 @@ u32 clock_speed = 200;
 u32 clock_speed = 333;
 #endif
 char main_path[512];
+static char *prog_name;
+static char *load_state_file = NULL;
+static int load_state_slot = -1;
+static char *quick_save_file_extension = "quicksave";
+char *mRomName = NULL;
+char *mRomPath = NULL;
+char *quick_save_file = NULL;
+u32 mQuickSaveAndPoweroff=0;
+
+
+
+
 
 void trigger_ext_event();
 
@@ -158,7 +173,7 @@ static void switch_to_romdir(void)
 {
   char buff[256];
   int r;
-  
+
   file_open(romdir_file, "romdir.txt", read);
 
   if(file_check_valid(romdir_file))
@@ -226,10 +241,146 @@ void init_main()
   flush_translation_cache_bios();
 }
 
+/* Quick save and turn off the console */
+void quick_save_and_poweroff()
+{
+    /* Vars */
+    char shell_cmd[1024];
+    FILE *fp;
+
+    /* Send command to kill any previously scheduled shutdown */
+    sprintf(shell_cmd, "pkill %s", SHELL_CMD_SCHEDULE_POWERDOWN);
+    fp = popen(shell_cmd, "r");
+    if (fp == NULL) {
+      printf("Failed to run command %s\n", shell_cmd);
+    }
+
+    /* Save  */
+    u16 *current_screen = copy_screen();
+    save_state(quick_save_file, current_screen);
+
+    /* Write quick load file */
+    sprintf(shell_cmd, "%s SDL_NOMOUSE=1 \"%s\" -loadStateFile \"%s\" \"%s\"",
+      SHELL_CMD_WRITE_QUICK_LOAD_CMD, prog_name, quick_save_file, mRomName);
+    printf("Cmd write quick load file:\n  %s\n", shell_cmd);
+    fp = popen(shell_cmd, "r");
+    if (fp == NULL) {
+      printf("Failed to run command %s\n", shell_cmd);
+    }
+
+    /* Clean Poweroff */
+    sprintf(shell_cmd, "%s", SHELL_CMD_POWERDOWN);
+    fp = popen(shell_cmd, "r");
+    if (fp == NULL) {
+      printf("Failed to run command %s\n", shell_cmd);
+    }
+
+    /* Exit Emulator */
+    quit();
+}
+
+/* Handler for SIGUSR1, caused by closing the console */
+void handle_sigusr1(int sig)
+{
+    //printf("Caught signal USR1 %d\n", sig);
+
+    /* Exit menu if it was launched */
+    stop_menu_loop = 1;
+
+    /* Signal to quick save and poweoff after next loop */
+    mQuickSaveAndPoweroff = 1;
+}
+
+void usage(){
+  printf("\n\n\ngpSP \n");
+  printf("usage: gpsp [options] [romfile]\n");
+  printf("options:\n"
+      " -fps        use to show fps\n"
+      " -loadStateSlot <num>  if ROM is specified, try loading savestate slot <num>\n"
+      " -loadStateFile <filePath>  if ROM is specified, try loading savestate file <filePath>\n");
+  exit(1);
+}
+
+void parse_cmd_line(int argc, char *argv[])
+{
+  int x, unrecognized = 0;
+
+  /* Save program name */
+  prog_name = argv[0];
+
+  /* Parse args */
+  for (x = 1; x < argc; x++)
+  {
+    if (argv[x][0] == '-')
+    {
+      if (strcasecmp(argv[x], "-loadStateSlot") == 0)
+      {
+        if (x+1 < argc) { ++x; load_state_slot = atoi(argv[x]); }
+      }
+      else if (strcasecmp(argv[x], "-loadStateFile") == 0) {
+        if (x+1 < argc) { ++x; load_state_file = argv[x]; }
+      }
+      else if (strcasecmp(argv[x], "-fps") == 0) {
+        fps_debug = 1;
+      }
+      else {
+        printf("Unrecognized command \"%s\" ", argv[x]);
+        unrecognized = 1;
+        break;
+      }
+    }
+    /* Check if file exists, Save ROM name, and ROM path */
+    else {
+      mRomName = argv[x];
+      FILE *f = fopen(mRomName, "rb");
+      if (f) {
+        /* Save Rom path */
+        mRomPath = (char *)malloc(strlen(mRomName)+1);
+        strcpy(mRomPath, mRomName);
+        char *slash = strrchr ((char*)mRomPath, '/');
+        *slash = 0;
+
+        /* Rom name without extension */
+        char *point = strrchr ((char*)slash+1, '.');
+        *point = 0;
+
+        /* Set quicksave filename */
+        quick_save_file = (char *)malloc(strlen(mRomPath) + strlen(slash+1) +
+          strlen(quick_save_file_extension) + 2 + 1);
+        sprintf(quick_save_file, "%s/%s.%s",
+          mRomPath, slash+1, quick_save_file_extension);
+        printf("Quick_save_file: %s\n", quick_save_file);
+
+        fclose(f);
+      }
+      else{
+        printf("Rom %s not found \n", mRomName);
+        unrecognized = 1;
+      }
+      break;
+    }
+  }
+
+  if (unrecognized) {
+    usage();
+  }
+}
+
 int main(int argc, char *argv[])
 {
   char bios_filename[512];
   int ret;
+
+  /* Parse arguments */
+  if (argc >= 2){
+    parse_cmd_line(argc, argv);
+  }
+  else{
+    usage();
+  }
+
+  /* Init Signals */
+  signal(SIGUSR1, handle_sigusr1);
 
 #ifdef PSP_BUILD
   sceKernelRegisterSubIntrHandler(PSP_VBLANK_INT, 0,
@@ -240,10 +391,8 @@ int main(int argc, char *argv[])
   init_gamepak_buffer();
 
   // Copy the directory path of the executable into main_path
-
   // ChangeWorkingDirectory will null out the filename out of the path
   ChangeWorkingDirectory(argv[0]);
-
   getcwd(main_path, 512);
 
 #ifdef PSP_BUILD
@@ -262,7 +411,7 @@ int main(int argc, char *argv[])
   /// --- Init menu ---
   init_menu_SDL();
 
-  sprintf(bios_filename, "%s" PATH_SEPARATOR "%s", main_path, "gba_bios.bin");
+  sprintf(bios_filename, "%s" PATH_SEPARATOR "%s", BIOS_PATH, "gba_bios.bin");
   ret = load_bios(bios_filename);
   if (ret != 0)
     ret = load_bios("gba_bios.bin");
@@ -334,10 +483,10 @@ int main(int argc, char *argv[])
 
   if(argc > 1)
   {
-    if(load_gamepak(argv[1]) == -1)
+    if(load_gamepak(mRomName) == -1)
     {
 #ifndef PSP_BUILD
-      printf("Failed to load gamepak %s, exiting.\n", argv[1]);
+      printf("Failed to load game: %s, exiting.\n", argv[1]);
 #endif
       exit(-1);
     }
@@ -346,30 +495,43 @@ int main(int argc, char *argv[])
 
     init_cpu();
     init_memory();
-  }
-  else
-  {
-    char load_filename[512];
-    switch_to_romdir();
-    if(load_file(file_ext, load_filename) == -1)
-    {
-      menu(copy_screen());
+
+  /* Load slot */
+    if(load_state_slot != -1){
+      printf("LOADING FROM SLOT %d...\n", load_state_slot+1);
+      char fname[1024];
+      get_savestate_filename_noshot(savestate_slot, fname);
+      load_state(fname);
+      printf("LOADED FROM SLOT %d\n", load_state_slot+1);
+      load_state_slot = -1;
     }
-    else
-    {
-      if(load_gamepak(load_filename) == -1)
-      {
-#ifndef PSP_BUILD
-        printf("Failed to load gamepak %s, exiting.\n", load_filename);
-#endif
-        exit(-1);
+    /* Load file */
+    else if(load_state_file != NULL){
+      printf("LOADING FROM FILE %s...\n", load_state_file);
+      load_state(load_state_file);
+      printf("LOADED FROM SLOT %s\n", load_state_file);
+      load_state_file = NULL;
+    }
+    /* Load quick save file */
+    else if(access( quick_save_file, F_OK ) != -1){
+      printf("Found quick save file: %s\n", quick_save_file);
+
+      int resume = launch_resume_menu_loop();
+      if(resume == RESUME_YES){
+        printf("Resume game from quick save file: %s\n", quick_save_file);
+        load_state(quick_save_file);
       }
+      else{
+        printf("Reset game\n");
+      }
+    }
 
-      set_clock_speed();
-      video_resolution_small();
-
-      init_cpu();
-      init_memory();
+    /* Remove quicksave file if present */
+    if (remove(quick_save_file) == 0){
+          printf("Deleted successfully: %s\n", quick_save_file);
+    }
+    else{
+        printf("Unable to delete the file: %s\n", quick_save_file);
     }
   }
 
@@ -388,11 +550,11 @@ int main(int argc, char *argv[])
 
 //  debug_on();
 
-  if(argc > 2)
+  /*if(argc > 2)
   {
     current_debug_state = COUNTDOWN_BREAKPOINT;
     breakpoint_value = strtol(argv[2], NULL, 16);
-  }
+  }*/
 
   trigger_ext_event();
 
@@ -644,6 +806,12 @@ u32 update_gba()
 
           if(update_input())
             continue;
+
+          /* Quick save and poweroff */
+          if(mQuickSaveAndPoweroff){
+            quick_save_and_poweroff();
+            mQuickSaveAndPoweroff = 0;
+          }
 
           update_gbc_sound(cpu_ticks);
 
@@ -1006,7 +1174,7 @@ void change_ext(const char *src, char *buffer, const char *extension)
     strcpy(dot_position, extension);
 }
 
-// make path: <main_path>/<romname>.<ext>
+// make path: <mRomPath>/<romname>.<ext>
 void make_rpath(char *buff, size_t size, const char *ext)
 {
   char *p;
@@ -1014,7 +1182,8 @@ void make_rpath(char *buff, size_t size, const char *ext)
   if (p == NULL)
     p = gamepak_filename;
 
-  snprintf(buff, size, "%s/%s", main_path, p);
+  //snprintf(buff, size, "%s/%s", main_path, p);
+  snprintf(buff, size, "%s/%s", mRomPath, p);
   p = strrchr(buff, '.');
   if (p != NULL)
     strcpy(p, ext);
