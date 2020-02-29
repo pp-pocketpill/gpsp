@@ -623,7 +623,7 @@ void run_menu_loop()
     int prevItem=menuItem;
 
     /// ------ Copy currently displayed screen -------
-    memcpy(backup_hw_screen->pixels, (uint16_t *)virtual_hw_screen->pixels,
+    memcpy(backup_hw_screen->pixels, (uint16_t *)hw_screen->pixels,
             RES_HW_SCREEN_HORIZONTAL * RES_HW_SCREEN_VERTICAL * sizeof(u16));
 
     /// -------- Main loop ---------

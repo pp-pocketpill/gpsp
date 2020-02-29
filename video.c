@@ -3405,7 +3405,7 @@ void flip_NNOptimized_AllowOutOfScreen(SDL_Surface *virtual_screen, SDL_Surface 
   int x_padding_ratio = x_padding*w1/w2;
   //printf("virtual_screen->h=%d, h2=%d\n", virtual_screen->h, h2);
 
-  for (int i=0;i<h2;i++) 
+  for (int i=0;i<h2;i++)
   {
     if(i>=RES_HW_SCREEN_VERTICAL){
       continue;
@@ -3415,7 +3415,7 @@ void flip_NNOptimized_AllowOutOfScreen(SDL_Surface *virtual_screen, SDL_Surface 
     y2 = ((i*y_ratio)>>16);
     uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y2*w1 + x_padding_ratio) *sizeof(uint16_t));
     int rat = 0;
-    for (int j=0;j<w2;j++) 
+    for (int j=0;j<w2;j++)
     {
       if(j>=RES_HW_SCREEN_HORIZONTAL){
         continue;
@@ -3424,7 +3424,7 @@ void flip_NNOptimized_AllowOutOfScreen(SDL_Surface *virtual_screen, SDL_Surface 
       *t++ = p[x2];
       rat += x_ratio;
       //printf("y=%d, x=%d, y2=%d, x2=%d, (y2*virtual_screen->w)+x2=%d\n", i, j, y2, x2, (y2*virtual_screen->w)+x2);
-    } 
+    }
   }
 }
 
@@ -3452,19 +3452,19 @@ void flip_Upscaling_Bilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_
   }
   int x_padding_ratio = x_padding*w1/w2;
 
-  for (int i=0;i<h2;i++) 
+  for (int i=0;i<h2;i++)
   {
     if(i>=RES_HW_SCREEN_VERTICAL){
       continue;
     }
 
-    uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)* 
+    uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)*
     					((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
     y = ((i*y_ratio)>>16);
     y_diff = (i*y_ratio) - (y<<16) ;
     uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y*w1 + x_padding_ratio) *sizeof(uint16_t));
     int rat = 0;
-    for (int j=0;j<w2;j++) 
+    for (int j=0;j<w2;j++)
     {
       if(j>=RES_HW_SCREEN_HORIZONTAL){
         continue;
@@ -3480,23 +3480,23 @@ void flip_Upscaling_Bilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_
 
       // red element
       // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
-      red_comp = (( ((p_val_tl&0xF800)>>11) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>5) )>>27) + 
+      red_comp = (( ((p_val_tl&0xF800)>>11) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>5) )>>27) +
       		(( ((p_val_tr&0xF800)>>11) * ((x_diff * ((1<<16)-y_diff))>>5) )>>27) +
-            (( ((p_val_bl&0xF800)>>11) * ((y_diff * ((1<<16)-x_diff))>>5) )>>27) + 
+            (( ((p_val_bl&0xF800)>>11) * ((y_diff * ((1<<16)-x_diff))>>5) )>>27) +
             (( ((p_val_br&0xF800)>>11) * ((y_diff * x_diff)>>5) )>>27);
 
       // green element
       // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
-      green_comp = (( ((p_val_tl&0x07E0)>>5) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>6) )>>26) + 
+      green_comp = (( ((p_val_tl&0x07E0)>>5) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>6) )>>26) +
       		(( ((p_val_tr&0x07E0)>>5) * ((x_diff * ((1<<16)-y_diff))>>6) )>>26) +
-            (( ((p_val_bl&0x07E0)>>5) * ((y_diff * ((1<<16)-x_diff))>>6) )>>26) + 
+            (( ((p_val_bl&0x07E0)>>5) * ((y_diff * ((1<<16)-x_diff))>>6) )>>26) +
             (( ((p_val_br&0x07E0)>>5) * ((y_diff * x_diff)>>6) )>>26);
 
       // blue element
       // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
-      blue_comp = (( ((p_val_tl&0x001F)) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>5) )>>27) + 
+      blue_comp = (( ((p_val_tl&0x001F)) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>5) )>>27) +
       		(( ((p_val_tr&0x001F)) * ((x_diff * ((1<<16)-y_diff))>>5) )>>27) +
-            (( ((p_val_bl&0x001F)) * ((y_diff * ((1<<16)-x_diff))>>5) )>>27) + 
+            (( ((p_val_bl&0x001F)) * ((y_diff * ((1<<16)-x_diff))>>5) )>>27) +
             (( ((p_val_br&0x001F)) * ((y_diff * x_diff)>>5) )>>27);
 
       /// --- Write pixel value ---
@@ -3504,7 +3504,7 @@ void flip_Upscaling_Bilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_
 
       /// --- Update x ----
       rat += x_ratio;
-    } 
+    }
   }
 }
 
@@ -3532,19 +3532,19 @@ void flip_Upscaling_Bilinear_Xonly(SDL_Surface *virtual_screen, SDL_Surface *har
   }
   int x_padding_ratio = x_padding*w1/w2;
 
-  for (int i=0;i<h2;i++) 
+  for (int i=0;i<h2;i++)
   {
     if(i>=RES_HW_SCREEN_VERTICAL){
       continue;
     }
 
-    uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)* 
+    uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)*
     					((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
     y = ((i*y_ratio)>>16);
     y_diff = (i*y_ratio) - (y<<16) ;
     uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y*w1 + x_padding_ratio) *sizeof(uint16_t));
     int rat = 0;
-    for (int j=0;j<w2;j++) 
+    for (int j=0;j<w2;j++)
     {
       if(j>=RES_HW_SCREEN_HORIZONTAL){
         continue;
@@ -3558,17 +3558,17 @@ void flip_Upscaling_Bilinear_Xonly(SDL_Surface *virtual_screen, SDL_Surface *har
 
       // red element
       // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
-      red_comp = (( (p_val_tl&0xF800) * ((1<<16)-x_diff) )>>16) + 
+      red_comp = (( (p_val_tl&0xF800) * ((1<<16)-x_diff) )>>16) +
       		(( (p_val_tr&0xF800) * x_diff )>>16);
 
       // green element
       // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
-      green_comp = (( (p_val_tl&0x07E0) * ((1<<16)-x_diff) )>>16) + 
+      green_comp = (( (p_val_tl&0x07E0) * ((1<<16)-x_diff) )>>16) +
       		(( (p_val_tr&0x07E0) * x_diff )>>16);
 
       // blue element
       // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
-      blue_comp = (( (p_val_tl&0x001F) * ((1<<16)-x_diff) )>>16) + 
+      blue_comp = (( (p_val_tl&0x001F) * ((1<<16)-x_diff) )>>16) +
       		(( (p_val_tr&0x001F) * x_diff )>>16);
 
       /// --- Write pixel value ---
@@ -3576,7 +3576,7 @@ void flip_Upscaling_Bilinear_Xonly(SDL_Surface *virtual_screen, SDL_Surface *har
 
       /// --- Update x ----
       rat += x_ratio;
-    } 
+    }
   }
 }
 
@@ -3604,19 +3604,19 @@ void flip_Upscaling_Bilinear_Yonly(SDL_Surface *virtual_screen, SDL_Surface *har
   }
   int x_padding_ratio = x_padding*w1/w2;
 
-  for (int i=0;i<h2;i++) 
+  for (int i=0;i<h2;i++)
   {
     if(i>=RES_HW_SCREEN_VERTICAL){
       continue;
     }
 
-    uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)* 
+    uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)*
     					((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
     y = ((i*y_ratio)>>16);
     y_diff = (i*y_ratio) - (y<<16) ;
     uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y*w1 + x_padding_ratio) *sizeof(uint16_t));
     int rat = 0;
-    for (int j=0;j<w2;j++) 
+    for (int j=0;j<w2;j++)
     {
       if(j>=RES_HW_SCREEN_HORIZONTAL){
         continue;
@@ -3630,17 +3630,17 @@ void flip_Upscaling_Bilinear_Yonly(SDL_Surface *virtual_screen, SDL_Surface *har
 
       // red element
       // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
-      red_comp = (( (p_val_tl&0xF800) * ((1<<16)-y_diff) )>>16) + 
+      red_comp = (( (p_val_tl&0xF800) * ((1<<16)-y_diff) )>>16) +
       		(( (p_val_bl&0xF800) * y_diff )>>16);
 
       // green element
       // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
-      green_comp = (( (p_val_tl&0x07E0) * ((1<<16)-y_diff) )>>16) + 
+      green_comp = (( (p_val_tl&0x07E0) * ((1<<16)-y_diff) )>>16) +
       		(( (p_val_bl&0x07E0) * y_diff )>>16);
 
       // blue element
       // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
-      blue_comp = (( (p_val_tl&0x001F) * ((1<<16)-y_diff) )>>16) + 
+      blue_comp = (( (p_val_tl&0x001F) * ((1<<16)-y_diff) )>>16) +
       		(( (p_val_bl&0x001F) * y_diff )>>16);
 
       /// --- Write pixel value ---
@@ -3648,7 +3648,7 @@ void flip_Upscaling_Bilinear_Yonly(SDL_Surface *virtual_screen, SDL_Surface *har
 
       /// --- Update x ----
       rat += x_ratio;
-    } 
+    }
   }
 }
 
@@ -3832,17 +3832,17 @@ void SDL_Rotate_270(SDL_Surface * hw_surface, SDL_Surface * virtual_hw_surface){
 
     /// --- Checking if same dimensions ---
     if(hw_surface->w != virtual_hw_surface->w || hw_surface->h != virtual_hw_surface->h){
-      printf("Error in SDL_FastBlit, hw_surface (%dx%d) and virtual_hw_surface (%dx%d) have different dimensions\n", 
+      printf("Error in SDL_FastBlit, hw_surface (%dx%d) and virtual_hw_surface (%dx%d) have different dimensions\n",
         hw_surface->w, hw_surface->h, virtual_hw_surface->w, virtual_hw_surface->h);
       return;
     }
-  
+
   /// --- Pixel copy and rotation (270) ---
   uint16_t *cur_p_src, *cur_p_dst;
   for(i=0; i<virtual_hw_surface->h; i++){
     for(j=0; j<virtual_hw_surface->w; j++){
       cur_p_src = source_pixels + i*virtual_hw_surface->w + j;
-      cur_p_dst = dest_pixels + (hw_surface->h-1-j)*hw_surface->w + i;      
+      cur_p_dst = dest_pixels + (hw_surface->h-1-j)*hw_surface->w + i;
       *cur_p_dst = *cur_p_src;
     }
   }
@@ -3866,6 +3866,13 @@ void clear_hw_screen(uint16_t color)
 
 void render_game()
 {
+  //If the surface must be locked
+  if( SDL_MUSTLOCK( hw_screen ) )
+  {
+    //Lock the surface
+    SDL_LockSurface( hw_screen );
+  }
+
   /// --------------Optimized Flip depending on aspect ratio -------------
   static int prev_aspect_ratio;
   if(prev_aspect_ratio != aspect_ratio || need_screen_cleared){
@@ -3877,66 +3884,63 @@ void render_game()
   switch(aspect_ratio){
     case ASPECT_RATIOS_TYPE_STRECHED:
     if(screen->w > RES_HW_SCREEN_HORIZONTAL){
-      flip_NNOptimized_LeftAndRightBilinear(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+      flip_NNOptimized_LeftAndRightBilinear(screen, hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     }
     else{
-	//flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
-	//flip_Upscaling_Bilinear_Yonly(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
-	upscale_160x240_to_240x240_bilinearish(screen, virtual_hw_screen);
+	upscale_160x240_to_240x240_bilinearish(screen, hw_screen);
     }
-    //flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     break;
 
     case ASPECT_RATIOS_TYPE_MANUAL:
-    ;uint32_t h_scaled = MIN(screen->h*RES_HW_SCREEN_HORIZONTAL/screen->w, 
+    ;uint32_t h_scaled = MIN(screen->h*RES_HW_SCREEN_HORIZONTAL/screen->w,
                               RES_HW_SCREEN_VERTICAL);
-    uint32_t h_zoomed = MIN(h_scaled + aspect_ratio_factor_percent*(RES_HW_SCREEN_VERTICAL - h_scaled)/100, 
+    uint32_t h_zoomed = MIN(h_scaled + aspect_ratio_factor_percent*(RES_HW_SCREEN_VERTICAL - h_scaled)/100,
                               RES_HW_SCREEN_VERTICAL);
     if(aspect_ratio_factor_percent == 0){
-    	flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, 
-        RES_HW_SCREEN_HORIZONTAL, 
+	flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
+        RES_HW_SCREEN_HORIZONTAL,
         MIN(screen->h*RES_HW_SCREEN_HORIZONTAL/screen->w, RES_HW_SCREEN_VERTICAL));
     }
     else if(screen->w > RES_HW_SCREEN_HORIZONTAL){
-      flip_NNOptimized_LeftAndRightBilinear(screen, virtual_hw_screen,
-          MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL), 
+      flip_NNOptimized_LeftAndRightBilinear(screen, hw_screen,
+          MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL),
           MIN(h_zoomed, RES_HW_SCREEN_VERTICAL));
     }
     else{
-    	/*flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen,
-          MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL), 
+	/*flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
+          MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL),
           MIN(h_zoomed, RES_HW_SCREEN_VERTICAL));*/
-      	flip_Upscaling_Bilinear_Yonly(screen, virtual_hw_screen,
-          MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL), 
+	flip_Upscaling_Bilinear_Yonly(screen, hw_screen,
+          MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL),
           MIN(h_zoomed, RES_HW_SCREEN_VERTICAL));
     }
     break;
 
     case ASPECT_RATIOS_TYPE_CROPPED:
     if(screen->w > RES_HW_SCREEN_HORIZONTAL){
-      flip_NNOptimized_LeftAndRightBilinear(screen, virtual_hw_screen,
-        MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL), 
+      flip_NNOptimized_LeftAndRightBilinear(screen, hw_screen,
+        MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL),
         RES_HW_SCREEN_VERTICAL);
     }
     else{
-    	/*flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen,
-        MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL), 
+	/*flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
+        MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL),
         RES_HW_SCREEN_VERTICAL);*/
-      flip_Upscaling_Bilinear_Yonly(screen, virtual_hw_screen,
-        MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL), 
+      flip_Upscaling_Bilinear_Yonly(screen, hw_screen,
+        MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL),
         RES_HW_SCREEN_VERTICAL);
     }
     break;
 
     case ASPECT_RATIOS_TYPE_SCALED:
     if(screen->w > RES_HW_SCREEN_HORIZONTAL){
-      flip_NNOptimized_LeftAndRightBilinear(screen, virtual_hw_screen, 
-        RES_HW_SCREEN_HORIZONTAL, 
+      flip_NNOptimized_LeftAndRightBilinear(screen, hw_screen,
+        RES_HW_SCREEN_HORIZONTAL,
         MIN(screen->h*RES_HW_SCREEN_HORIZONTAL/screen->w, RES_HW_SCREEN_VERTICAL));
     }
     else{
-      flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, 
-        RES_HW_SCREEN_HORIZONTAL, 
+      flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
+        RES_HW_SCREEN_HORIZONTAL,
         MIN(screen->h*RES_HW_SCREEN_HORIZONTAL/screen->w, RES_HW_SCREEN_VERTICAL));
     }
     break;
@@ -3944,9 +3948,16 @@ void render_game()
     default:
     printf("Wrong aspect ratio value: %d\n", aspect_ratio);
     aspect_ratio = ASPECT_RATIOS_TYPE_STRECHED;
-    flip_NNOptimized_AllowOutOfScreen(screen, virtual_hw_screen, 
+    flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
         RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     break;
+  }
+
+  //If the surface must be unlocked
+  if( SDL_MUSTLOCK( hw_screen ) )
+  {
+    //Lock the surface
+    SDL_UnlockSurface( hw_screen );
   }
 }
 
@@ -3961,10 +3972,6 @@ void update_screen()
 
 void flip_screen()
 {
-	
-  /// ---- Fast blit ----
-  memcpy(hw_screen->pixels, virtual_hw_screen->pixels, hw_screen->h*hw_screen->w*sizeof(uint16_t));
-	
   SDL_Flip(hw_screen);
 }
 
@@ -3979,7 +3986,7 @@ void init_video()
         exit(EXIT_FAILURE);
   	}
 
-	hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL, 
+	hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
                                 16, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_DOUBLEBUF);
 	printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
 	virtual_hw_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
