@@ -865,6 +865,7 @@ void run_menu_loop()
                             MENU_DEBUG_PRINTF("Exit game\n");
                             if(menu_confirmation){
                                 MENU_DEBUG_PRINTF("Exit game - confirmed\n");
+
                                 /// ----- The game should be saved here ----
                                 u16 *current_screen = copy_screen();
                                 save_state(quick_save_file, current_screen);

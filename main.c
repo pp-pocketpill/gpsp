@@ -352,6 +352,7 @@ void parse_cmd_line(int argc, char *argv[])
         printf("Quick_save_file: %s\n", quick_save_file);
 
         fclose(f);
+        break;
       }
       else{
         printf("Rom %s not found \n", mRomName);
@@ -496,7 +497,7 @@ int main(int argc, char *argv[])
     init_cpu();
     init_memory();
 
-  /* Load slot */
+    /* Load slot */
     if(load_state_slot != -1){
       printf("LOADING FROM SLOT %d...\n", load_state_slot+1);
       char fname[1024];
