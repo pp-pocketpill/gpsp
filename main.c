@@ -524,15 +524,15 @@ int main(int argc, char *argv[])
       }
       else{
         printf("Reset game\n");
-      }
-    }
 
-    /* Remove quicksave file if present */
-    if (remove(quick_save_file) == 0){
-          printf("Deleted successfully: %s\n", quick_save_file);
-    }
-    else{
-        printf("Unable to delete the file: %s\n", quick_save_file);
+        /* Remove quicksave file if present */
+        if (remove(quick_save_file) == 0){
+              printf("Deleted successfully: %s\n", quick_save_file);
+        }
+        else{
+            printf("Unable to delete the file: %s\n", quick_save_file);
+        }
+      }
     }
   }
 

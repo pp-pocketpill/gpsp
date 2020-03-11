@@ -3978,6 +3978,10 @@ void flip_screen()
 
 void init_video()
 {
+
+    /* Set env var for no mouse */
+    putenv(strdup("SDL_NOMOUSE=1"));
+
   	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
 
   	if(TTF_Init())
