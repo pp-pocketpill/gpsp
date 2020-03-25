@@ -3850,7 +3850,7 @@ void SDL_Rotate_270(SDL_Surface * hw_surface, SDL_Surface * virtual_hw_surface){
 
 void clear_hw_screen(uint16_t color)
 {
-  if(virtual_hw_screen){
+  /*if(virtual_hw_screen){
     uint16_t *dest_ptr = (uint16_t *)virtual_hw_screen->pixels;
     uint32_t x, y;
 
@@ -3861,7 +3861,9 @@ void clear_hw_screen(uint16_t color)
         *dest_ptr = color;
       }
     }
-  }
+  }*/
+
+  memset(hw_screen->pixels, 0, hw_screen->w*hw_screen->h*sizeof(uint16_t));
 }
 
 void render_game()
