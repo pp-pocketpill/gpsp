@@ -23,7 +23,7 @@ typedef enum{
 ///------ Definition of the different aspect ratios
 #define ASPECT_RATIOS \
     X(ASPECT_RATIOS_TYPE_MANUAL, "MANUAL ZOOM") \
-    X(ASPECT_RATIOS_TYPE_STRECHED, "STRECHED") \
+    X(ASPECT_RATIOS_TYPE_STRETCHED, "STRETCHED") \
     X(ASPECT_RATIOS_TYPE_CROPPED, "CROPPED") \
     X(ASPECT_RATIOS_TYPE_SCALED, "SCALED") \
     X(NB_ASPECT_RATIOS_TYPES, "")
@@ -57,6 +57,7 @@ typedef enum {RESUME_OPTIONS} ENUM_RESUME_OPTIONS;
 #define SHELL_CMD_POWERDOWN                 "shutdown_funkey"
 #define SHELL_CMD_SCHEDULE_POWERDOWN        "sched_shutdown"
 #define SHELL_CMD_NOTIF                     "notif_set"
+#define SHELL_CMD_NOTIF_CLEAR               "notif_clear"
 #define SHELL_CMD_WRITE_QUICK_LOAD_CMD      "write_args_quick_load_file"
 
 ////------ Global variables -------

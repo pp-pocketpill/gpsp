@@ -3459,7 +3459,7 @@ void flip_Upscaling_Bilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_
     }
 
     uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)*
-    					((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
+              ((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
     y = ((i*y_ratio)>>16);
     y_diff = (i*y_ratio) - (y<<16) ;
     uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y*w1 + x_padding_ratio) *sizeof(uint16_t));
@@ -3481,21 +3481,21 @@ void flip_Upscaling_Bilinear(SDL_Surface *virtual_screen, SDL_Surface *hardware_
       // red element
       // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
       red_comp = (( ((p_val_tl&0xF800)>>11) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>5) )>>27) +
-      		(( ((p_val_tr&0xF800)>>11) * ((x_diff * ((1<<16)-y_diff))>>5) )>>27) +
+          (( ((p_val_tr&0xF800)>>11) * ((x_diff * ((1<<16)-y_diff))>>5) )>>27) +
             (( ((p_val_bl&0xF800)>>11) * ((y_diff * ((1<<16)-x_diff))>>5) )>>27) +
             (( ((p_val_br&0xF800)>>11) * ((y_diff * x_diff)>>5) )>>27);
 
       // green element
       // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
       green_comp = (( ((p_val_tl&0x07E0)>>5) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>6) )>>26) +
-      		(( ((p_val_tr&0x07E0)>>5) * ((x_diff * ((1<<16)-y_diff))>>6) )>>26) +
+          (( ((p_val_tr&0x07E0)>>5) * ((x_diff * ((1<<16)-y_diff))>>6) )>>26) +
             (( ((p_val_bl&0x07E0)>>5) * ((y_diff * ((1<<16)-x_diff))>>6) )>>26) +
             (( ((p_val_br&0x07E0)>>5) * ((y_diff * x_diff)>>6) )>>26);
 
       // blue element
       // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
       blue_comp = (( ((p_val_tl&0x001F)) * ((((1<<16)-x_diff) * ((1<<16)-y_diff))>>5) )>>27) +
-      		(( ((p_val_tr&0x001F)) * ((x_diff * ((1<<16)-y_diff))>>5) )>>27) +
+          (( ((p_val_tr&0x001F)) * ((x_diff * ((1<<16)-y_diff))>>5) )>>27) +
             (( ((p_val_bl&0x001F)) * ((y_diff * ((1<<16)-x_diff))>>5) )>>27) +
             (( ((p_val_br&0x001F)) * ((y_diff * x_diff)>>5) )>>27);
 
@@ -3539,7 +3539,7 @@ void flip_Upscaling_Bilinear_Xonly(SDL_Surface *virtual_screen, SDL_Surface *har
     }
 
     uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)*
-    					((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
+              ((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
     y = ((i*y_ratio)>>16);
     y_diff = (i*y_ratio) - (y<<16) ;
     uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y*w1 + x_padding_ratio) *sizeof(uint16_t));
@@ -3559,17 +3559,17 @@ void flip_Upscaling_Bilinear_Xonly(SDL_Surface *virtual_screen, SDL_Surface *har
       // red element
       // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
       red_comp = (( (p_val_tl&0xF800) * ((1<<16)-x_diff) )>>16) +
-      		(( (p_val_tr&0xF800) * x_diff )>>16);
+          (( (p_val_tr&0xF800) * x_diff )>>16);
 
       // green element
       // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
       green_comp = (( (p_val_tl&0x07E0) * ((1<<16)-x_diff) )>>16) +
-      		(( (p_val_tr&0x07E0) * x_diff )>>16);
+          (( (p_val_tr&0x07E0) * x_diff )>>16);
 
       // blue element
       // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
       blue_comp = (( (p_val_tl&0x001F) * ((1<<16)-x_diff) )>>16) +
-      		(( (p_val_tr&0x001F) * x_diff )>>16);
+          (( (p_val_tr&0x001F) * x_diff )>>16);
 
       /// --- Write pixel value ---
       *t++ = (red_comp&0xF800) + (green_comp&0x07E0) + (blue_comp&0x001F);
@@ -3611,7 +3611,7 @@ void flip_Upscaling_Bilinear_Yonly(SDL_Surface *virtual_screen, SDL_Surface *har
     }
 
     uint16_t* t = (uint16_t*)(hardware_screen->pixels+((i+y_padding)*
-    					((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
+              ((w2>RES_HW_SCREEN_HORIZONTAL)?RES_HW_SCREEN_HORIZONTAL:w2) )*sizeof(uint16_t));
     y = ((i*y_ratio)>>16);
     y_diff = (i*y_ratio) - (y<<16) ;
     uint16_t* p = (uint16_t*)(virtual_screen->pixels + (y*w1 + x_padding_ratio) *sizeof(uint16_t));
@@ -3631,17 +3631,17 @@ void flip_Upscaling_Bilinear_Yonly(SDL_Surface *virtual_screen, SDL_Surface *har
       // red element
       // Yr = Ar(1-w)(1-h) + Br(w)(1-h) + Cr(h)(1-w) + Dr(wh)
       red_comp = (( (p_val_tl&0xF800) * ((1<<16)-y_diff) )>>16) +
-      		(( (p_val_bl&0xF800) * y_diff )>>16);
+          (( (p_val_bl&0xF800) * y_diff )>>16);
 
       // green element
       // Yg = Ag(1-w)(1-h) + Bg(w)(1-h) + Cg(h)(1-w) + Dg(wh)
       green_comp = (( (p_val_tl&0x07E0) * ((1<<16)-y_diff) )>>16) +
-      		(( (p_val_bl&0x07E0) * y_diff )>>16);
+          (( (p_val_bl&0x07E0) * y_diff )>>16);
 
       // blue element
       // Yb = Ab(1-w)(1-h) + Bb(w)(1-h) + Cb(h)(1-w) + Db(wh)
       blue_comp = (( (p_val_tl&0x001F) * ((1<<16)-y_diff) )>>16) +
-      		(( (p_val_bl&0x001F) * y_diff )>>16);
+          (( (p_val_bl&0x001F) * y_diff )>>16);
 
       /// --- Write pixel value ---
       *t++ = (red_comp&0xF800) + (green_comp&0x07E0) + (blue_comp&0x001F);
@@ -3770,46 +3770,46 @@ void flip_NNOptimized_LeftAndRightBilinear(SDL_Surface *virtual_screen, SDL_Surf
 
 void upscale_160x240_to_240x240_bilinearish(SDL_Surface *src_surface, SDL_Surface *dst_surface)
 {
-	if(src_surface->w != 240){
-		printf("src_surface->w (%d) != 240 \n", src_surface->w);
-		return;
-	}
-	if(src_surface->h != 160){
-		printf("src_surface->h (%d) != 160 \n", src_surface->h);
-		return;
-	}
+  if(src_surface->w != 240){
+    printf("src_surface->w (%d) != 240 \n", src_surface->w);
+    return;
+  }
+  if(src_surface->h != 160){
+    printf("src_surface->h (%d) != 160 \n", src_surface->h);
+    return;
+  }
 
-	uint16_t* Src16 = (uint16_t*) src_surface->pixels;
-	uint16_t* Dst16 = (uint16_t*) dst_surface->pixels;
-	// There are 80 blocks of 2 pixels vertically, and 240 of 1 horizontally.
-	// Each block of 2x1 becomes 3x1.
-	uint32_t BlockX, BlockY;
-	uint16_t* BlockSrc;
-	uint16_t* BlockDst;
-	for (BlockY = 0; BlockY < 80; BlockY++)
-	{
-		BlockSrc = Src16 + BlockY * 240 * 2;
-		BlockDst = Dst16 + BlockY * 240 * 3;
-		for (BlockX = 0; BlockX < 240; BlockX++)
-		{
-			/* Vertically:
-			 * Before(2):
-			 * (a)(b)
-			 * After(3):
-			 * (a)(ab)(b)
-			 */
+  uint16_t* Src16 = (uint16_t*) src_surface->pixels;
+  uint16_t* Dst16 = (uint16_t*) dst_surface->pixels;
+  // There are 80 blocks of 2 pixels vertically, and 240 of 1 horizontally.
+  // Each block of 2x1 becomes 3x1.
+  uint32_t BlockX, BlockY;
+  uint16_t* BlockSrc;
+  uint16_t* BlockDst;
+  for (BlockY = 0; BlockY < 80; BlockY++)
+  {
+    BlockSrc = Src16 + BlockY * 240 * 2;
+    BlockDst = Dst16 + BlockY * 240 * 3;
+    for (BlockX = 0; BlockX < 240; BlockX++)
+    {
+      /* Vertically:
+       * Before(2):
+       * (a)(b)
+       * After(3):
+       * (a)(ab)(b)
+       */
 
-			// -- Column 1 --
-			uint16_t  _1 = *(BlockSrc               );
-			*(BlockDst               ) = _1;
-			uint16_t  _2 = *(BlockSrc            + 240*1);
-			*(BlockDst            + 240*1) = Weight1_1( _1,  _2);
-			*(BlockDst            + 240*2) = _2;
+      // -- Column 1 --
+      uint16_t  _1 = *(BlockSrc               );
+      *(BlockDst               ) = _1;
+      uint16_t  _2 = *(BlockSrc            + 240*1);
+      *(BlockDst            + 240*1) = Weight1_1( _1,  _2);
+      *(BlockDst            + 240*2) = _2;
 
-			BlockSrc += 1;
-			BlockDst += 1;
-		}
-	}
+      BlockSrc += 1;
+      BlockDst += 1;
+    }
+  }
 }
 
 
@@ -3884,12 +3884,12 @@ void render_game()
   }
 
   switch(aspect_ratio){
-    case ASPECT_RATIOS_TYPE_STRECHED:
+    case ASPECT_RATIOS_TYPE_STRETCHED:
     if(screen->w > RES_HW_SCREEN_HORIZONTAL){
       flip_NNOptimized_LeftAndRightBilinear(screen, hw_screen, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     }
     else{
-	upscale_160x240_to_240x240_bilinearish(screen, hw_screen);
+        upscale_160x240_to_240x240_bilinearish(screen, hw_screen);
     }
     break;
 
@@ -3899,7 +3899,7 @@ void render_game()
     uint32_t h_zoomed = MIN(h_scaled + aspect_ratio_factor_percent*(RES_HW_SCREEN_VERTICAL - h_scaled)/100,
                               RES_HW_SCREEN_VERTICAL);
     if(aspect_ratio_factor_percent == 0){
-	flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
+      flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
         RES_HW_SCREEN_HORIZONTAL,
         MIN(screen->h*RES_HW_SCREEN_HORIZONTAL/screen->w, RES_HW_SCREEN_VERTICAL));
     }
@@ -3909,10 +3909,10 @@ void render_game()
           MIN(h_zoomed, RES_HW_SCREEN_VERTICAL));
     }
     else{
-	/*flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
+      /*flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
           MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL),
           MIN(h_zoomed, RES_HW_SCREEN_VERTICAL));*/
-	flip_Upscaling_Bilinear_Yonly(screen, hw_screen,
+        flip_Upscaling_Bilinear_Yonly(screen, hw_screen,
           MAX(screen->w*h_zoomed/screen->h, RES_HW_SCREEN_HORIZONTAL),
           MIN(h_zoomed, RES_HW_SCREEN_VERTICAL));
     }
@@ -3925,9 +3925,6 @@ void render_game()
         RES_HW_SCREEN_VERTICAL);
     }
     else{
-	/*flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
-        MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL),
-        RES_HW_SCREEN_VERTICAL);*/
       flip_Upscaling_Bilinear_Yonly(screen, hw_screen,
         MAX(screen->w*RES_HW_SCREEN_VERTICAL/screen->h, RES_HW_SCREEN_HORIZONTAL),
         RES_HW_SCREEN_VERTICAL);
@@ -3949,7 +3946,7 @@ void render_game()
 
     default:
     printf("Wrong aspect ratio value: %d\n", aspect_ratio);
-    aspect_ratio = ASPECT_RATIOS_TYPE_STRECHED;
+    aspect_ratio = ASPECT_RATIOS_TYPE_STRETCHED;
     flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
         RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     break;
@@ -3984,31 +3981,31 @@ void init_video()
     /* Set env var for no mouse */
     putenv(strdup("SDL_NOMOUSE=1"));
 
-  	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
+    SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK | SDL_INIT_NOPARACHUTE);
 
-  	if(TTF_Init())
-  	{
+    if(TTF_Init())
+    {
         fprintf(stderr, "Error TTF_Init: %s\n", TTF_GetError());
         exit(EXIT_FAILURE);
-  	}
+    }
 
-	hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
+  hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
                                 16, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_DOUBLEBUF);
-	printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
-	virtual_hw_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
-	
-	if (screen)
-		SDL_FreeSurface(screen);
-	screen = SDL_CreateRGBSurface(SDL_SWSURFACE, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
-	
+  printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
+  virtual_hw_screen = SDL_CreateRGBSurface(SDL_SWSURFACE, RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+
+  if (screen)
+    SDL_FreeSurface(screen);
+  screen = SDL_CreateRGBSurface(SDL_SWSURFACE, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+
   SDL_ShowCursor(0);
 }
 
 void deinit_video()
 {
   if (screen)
-    	SDL_FreeSurface(screen);
-	SDL_FreeSurface(virtual_hw_screen);
+      SDL_FreeSurface(screen);
+  SDL_FreeSurface(virtual_hw_screen);
   TTF_Quit();
 }
 
@@ -4243,8 +4240,8 @@ void video_resolution_large()
     SDL_FreeSurface(screen);
   screen = SDL_CreateRGBSurface(SDL_SWSURFACE, 320, 240, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
   printf("* video_resolution_large: Creating 320x240 surface\n");
-	resolution_width = 320;
-	resolution_height = 240;
+  resolution_width = 320;
+  resolution_height = 240;
 #else
   screen = SDL_SetVideoMode(480, 272, 16, SDL_FULLSCREEN);
   printf("* video_resolution_large: Setting resolution to 480x272\n");
@@ -4282,18 +4279,18 @@ void video_resolution_small()
 
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
 #elif defined(CHIP_BUILD)
-	hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
+  hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
                                 16, SDL_FULLSCREEN | SDL_HWSURFACE);
   printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
-	if (screen)
-		SDL_FreeSurface(screen);
-	screen = SDL_CreateRGBSurface(SDL_SWSURFACE, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+  if (screen)
+    SDL_FreeSurface(screen);
+  screen = SDL_CreateRGBSurface(SDL_SWSURFACE, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
   printf("* video_resolution_small: Creating 240x160 surface\n");
 #else
   screen = SDL_SetVideoMode(small_resolution_width * video_scale,
    small_resolution_height * video_scale, 16, 0);
   printf("* video_resolution_small: Setting resolution to (%d * %d)x(%d * %d).\n",
-  	small_resolution_width, video_scale, small_resolution_height, video_scale);
+    small_resolution_width, video_scale, small_resolution_height, video_scale);
 #endif
   resolution_width = GBA_SCREEN_WIDTH;
   resolution_height = GBA_SCREEN_HEIGHT;
