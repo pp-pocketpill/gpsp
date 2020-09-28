@@ -491,11 +491,8 @@ void menu_screen_refresh(int menuItem, int prevItem, int scroll, uint8_t menu_co
                 }
                 else{
                     /// ---- Write current Save state ----
-                    get_savestate_filename(savestate_slot, fname);
-                    file_open(savestate_file, fname, read);
-                    if(file_check_valid(savestate_file))
-                    {
-                        file_close(savestate_file);
+                    get_savestate_filename_noshot(savestate_slot, fname);
+                    if(access(fname, F_OK ) != -1){
                         printf("Found Save slot: %s\n", fname);
                         char *p = strrchr (fname, '/');
                         char *basename = p ? p + 1 : (char *) fname;
@@ -541,11 +538,8 @@ void menu_screen_refresh(int menuItem, int prevItem, int scroll, uint8_t menu_co
                     }
                     else{
                         /// ---- Write current Load state ----
-                        get_savestate_filename(savestate_slot, fname);
-                        file_open(savestate_file, fname, read);
-                        if(file_check_valid(savestate_file))
-                        {
-                            file_close(savestate_file);
+                        get_savestate_filename_noshot(savestate_slot, fname);
+                        if(access(fname, F_OK ) != -1){
                             printf("Found Load slot: %s\n", fname);
                             char *p = strrchr (fname, '/');
                             char *basename = p ? p + 1 : (char *) fname;
