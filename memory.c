@@ -2013,6 +2013,7 @@ s32 load_game_config(char *gamepak_title, char *gamepak_code, char *gamepak_make
   char current_variable[256];
   char current_value[256];
   char config_path[512];
+  int config_file_found = 0;
   FILE *config_file;
 
   idle_loop_target_pc = 0xFFFFFFFF;
@@ -2023,10 +2024,20 @@ s32 load_game_config(char *gamepak_title, char *gamepak_code, char *gamepak_make
   flash_device_id = FLASH_DEVICE_MACRONIX_64KB;
 
   sprintf(config_path, "%s" PATH_SEPARATOR "%s", main_path, CONFIG_FILENAME);
-
   config_file = fopen(config_path, "rb");
+  if(config_file){
+    config_file_found = 1;
+  }
+  else{
+    /** UGLY: Hard bypass path, to change more elegantly: "gpsp_bin_path/CONFIG_FILENAME"*/
+    sprintf(config_path, "/usr/games" PATH_SEPARATOR "%s", CONFIG_FILENAME);
+    config_file = fopen(config_path, "rb");
+    if(config_file){
+      config_file_found = 1;
+    }
+  }
 
-  if(config_file)
+  if(config_file_found)
   {
     while(fgets(current_line, 256, config_file))
     {
