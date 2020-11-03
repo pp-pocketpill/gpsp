@@ -156,7 +156,7 @@ void trigger_ext_event();
 
 static const char *file_ext[] = { ".gba", ".bin", ".zip", NULL };
 
-#ifndef PSP_BUILD
+#if !defined(PSP_BUILD) && !defined(CHIP_BUILD)
 static void ChangeWorkingDirectory(char *exe)
 {
 #ifndef _WIN32_WCE
