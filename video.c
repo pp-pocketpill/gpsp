@@ -3868,12 +3868,6 @@ void clear_hw_screen(uint16_t color)
 
 void render_game()
 {
-  //If the surface must be locked
-  if( SDL_MUSTLOCK( hw_screen ) )
-  {
-    //Lock the surface
-    SDL_LockSurface( hw_screen );
-  }
 
   /// --------------Optimized Flip depending on aspect ratio -------------
   static int prev_aspect_ratio;
@@ -3950,13 +3944,6 @@ void render_game()
     flip_NNOptimized_AllowOutOfScreen(screen, hw_screen,
         RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     break;
-  }
-
-  //If the surface must be unlocked
-  if( SDL_MUSTLOCK( hw_screen ) )
-  {
-    //Lock the surface
-    SDL_UnlockSurface( hw_screen );
   }
 }
 
@@ -4224,7 +4211,7 @@ void video_resolution_large()
 #ifdef GP2X_BUILD
   SDL_FreeSurface(screen);
   SDL_GP2X_AllowGfxMemory(NULL, 0);
-    hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE);
+    hw_screen = SDL_SetVideoMode(320, 240, 16, SDL_HWSURFACE | SDL_DOUBLEBUF);
   screen = SDL_CreateRGBSurface(SDL_HWSURFACE, 320, 240, 16, 0xFFFF,
    0xFFFF, 0xFFFF, 0);
   resolution_width = 320;
@@ -4234,7 +4221,7 @@ void video_resolution_large()
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
 #elif defined(CHIP_BUILD)
   hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
-                                16, SDL_FULLSCREEN | SDL_HWSURFACE);
+                                16, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_DOUBLEBUF);
   printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
   if (screen)
     SDL_FreeSurface(screen);
@@ -4243,7 +4230,7 @@ void video_resolution_large()
   resolution_width = 320;
   resolution_height = 240;
 #else
-  screen = SDL_SetVideoMode(480, 272, 16, SDL_FULLSCREEN);
+  screen = SDL_SetVideoMode(480, 272, 16, SDL_FULLSCREEN | SDL_DOUBLEBUF);
   printf("* video_resolution_large: Setting resolution to 480x272\n");
   resolution_width = 480;
   resolution_height = 272;
@@ -4280,7 +4267,7 @@ void video_resolution_small()
   warm_change_cb_upper(WCB_C_BIT|WCB_B_BIT, 1);
 #elif defined(CHIP_BUILD)
   hw_screen = SDL_SetVideoMode(RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL,
-                                16, SDL_FULLSCREEN | SDL_HWSURFACE);
+                                16, SDL_FULLSCREEN | SDL_HWSURFACE | SDL_DOUBLEBUF);
   printf("* init_video: Creating %dx%d surface\n", RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
   if (screen)
     SDL_FreeSurface(screen);
