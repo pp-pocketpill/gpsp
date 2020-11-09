@@ -37,7 +37,6 @@
 #ifdef _WIN32_WCE
   #include <windows.h>
 #else
-  #define _BSD_SOURCE // sync
   #include <stdlib.h>
   #include <stdio.h>
   #include <string.h>
