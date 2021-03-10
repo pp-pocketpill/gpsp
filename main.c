@@ -103,7 +103,6 @@ static char *quick_save_file_extension = "quicksave";
 char *mRomName = NULL;
 char *mRomPath = NULL;
 char *quick_save_file = NULL;
-char *console_name;
 char *cfg_file_default = NULL;
 char *cfg_file_rom = NULL;
 static char *cfg_file_default_name = "default_config";
