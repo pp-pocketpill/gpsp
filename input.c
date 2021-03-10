@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "menu.h"
+#include "configfile.h"
 #include "video.h"
 
 // Special thanks to psp298 for the analog->dpad code!
@@ -943,6 +944,9 @@ u32 update_input()
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
           }
+
+          // Save config file
+          configfile_save(cfg_file_rom);
         }
         /// --- Aspect ratio increase ---
         else if(event.key.keysym.sym == SDLK_i)
@@ -964,6 +968,9 @@ u32 update_input()
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
           }
+
+          // Save config file
+          configfile_save(cfg_file_rom);
         }
         /// --- Change display mode ---
         else if(event.key.keysym.sym == SDLK_h)
@@ -987,6 +994,9 @@ u32 update_input()
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
           }
+
+          // Save config file
+          configfile_save(cfg_file_rom);
         }
         else if(event.key.keysym.sym == SDLK_BACKQUOTE)
         {

@@ -18,8 +18,10 @@
  */
 
 #include <signal.h>
+#include <ini.h>
 #include "common.h"
 #include "menu.h"
+#include "configfile.h"
 #include "video.h"
 
 #define BIOS_PATH "/mnt/Game Boy Advance"
@@ -101,6 +103,11 @@ static char *quick_save_file_extension = "quicksave";
 char *mRomName = NULL;
 char *mRomPath = NULL;
 char *quick_save_file = NULL;
+char *console_name;
+char *cfg_file_default = NULL;
+char *cfg_file_rom = NULL;
+static char *cfg_file_default_name = "default_config";
+static char *cfg_file_extension = "cfg";
 u32 mQuickSaveAndPoweroff=0;
 
 
@@ -333,7 +340,7 @@ void parse_cmd_line(int argc, char *argv[])
         *slash = 0;
 
         /* Rom name without extension */
-        char *point = strrchr ((char*)slash+1, '.');
+        char *point = strrchr((char*)slash+1, '.');
         *point = 0;
 
         /* Set quicksave filename */
@@ -342,6 +349,25 @@ void parse_cmd_line(int argc, char *argv[])
         sprintf(quick_save_file, "%s/%s.%s",
           mRomPath, slash+1, quick_save_file_extension);
         printf("Quick_save_file: %s\n", quick_save_file);
+
+        /* Set rom cfg filepath */
+        cfg_file_rom = (char *)malloc(strlen(mRomPath) + strlen(slash+1) +
+          strlen(cfg_file_extension) + 2 + 1);
+        sprintf(cfg_file_rom, "%s/%s.%s",
+          mRomPath, slash+1, cfg_file_extension);
+        printf("cfg_file_rom: %s\n", cfg_file_rom);
+
+        /* Set console cfg filepath */
+        cfg_file_default = (char *)malloc(strlen(mRomPath) + strlen(cfg_file_default_name) +
+          strlen(cfg_file_extension) + 2 + 1);
+        sprintf(cfg_file_default, "%s/%s.%s",
+          mRomPath, cfg_file_default_name, cfg_file_extension);
+        printf("cfg_file_default: %s\n", cfg_file_default);
+
+        /** Load config files */
+        configfile_load(cfg_file_default);
+        configfile_load(cfg_file_rom);
+
 
         fclose(f);
         break;
