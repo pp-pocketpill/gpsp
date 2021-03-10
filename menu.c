@@ -996,6 +996,10 @@ void run_menu_loop()
 
     /* Start Ampli */
     popen(SHELL_CMD_TURN_AMPLI_ON, "r");
+
+    /// ------ Reset last screen ------
+    SDL_BlitSurface(backup_hw_screen, NULL, hw_screen, NULL);
+    SDL_Flip(hw_screen);
 }
 
 
@@ -1172,6 +1176,10 @@ int launch_resume_menu_loop()
         /* reset screen refresh */
         screen_refresh = 0;
     }
+
+    /// ----- Clear screen -----
+    SDL_FillRect(hw_screen, NULL, 0);
+    SDL_Flip(hw_screen);
 
     /* Free SDL Surfaces */
     if(bg_surface)
