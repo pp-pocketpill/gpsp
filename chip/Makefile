@@ -8,7 +8,7 @@ CC        = $(CROSS_COMPILE)-gcc
 
 OBJS      = chip.o main.o menu.o cpu.o memory.o video.o input.o sound.o gui.o \
             cheats.o zip.o cpu_threaded.o arm_stub.o video_blend.o warm.o \
-            upscale_aspect.o neon_scaler.o configfile.o
+            upscale_aspect.o neon_scaler.o configfile_fk.o
 BIN       = gpsp
 
 # Platform specific definitions 

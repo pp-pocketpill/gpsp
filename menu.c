@@ -17,7 +17,7 @@
 #include "menu.h"
 #include "gui.h"
 #include "video.h"
-#include "configfile.h"
+#include "configfile_fk.h"
 
 
 /// -------------- DEFINES --------------

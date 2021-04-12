@@ -19,7 +19,7 @@
 
 #include "common.h"
 #include "menu.h"
-#include "configfile.h"
+#include "configfile_fk.h"
 #include "video.h"
 
 // Special thanks to psp298 for the analog->dpad code!

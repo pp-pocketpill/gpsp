@@ -22,7 +22,7 @@
 #define WANT_FONT_BITS
 #include "font.h"
 #include "menu.h"
-#include "configfile.h"
+#include "configfile_fk.h"
 
 #ifdef CHIP_BUILD
 #include "arm/neon_scaler.h"

@@ -21,7 +21,7 @@
 #include <ini.h>
 #include "common.h"
 #include "menu.h"
-#include "configfile.h"
+#include "configfile_fk.h"
 #include "video.h"
 
 #define BIOS_PATH "/mnt/Game Boy Advance"
@@ -106,7 +106,7 @@ char *quick_save_file = NULL;
 char *cfg_file_default = NULL;
 char *cfg_file_rom = NULL;
 static char *cfg_file_default_name = "default_config";
-static char *cfg_file_extension = "cfg";
+static char *cfg_file_extension = "fkcfg";
 u32 mQuickSaveAndPoweroff=0;
 
 
