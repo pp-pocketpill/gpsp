@@ -368,6 +368,7 @@ void init_menu_system_values(){
         volume_percentage = 50; ///wrong value: setting default to 50
     }
     else{
+        pclose(fp);
         fgets(res, sizeof(res)-1, fp);
 
         /// Check if Volume is a number (at least the first char)
@@ -388,6 +389,7 @@ void init_menu_system_values(){
         brightness_percentage = 50; ///wrong value: setting default to 50
     }
     else{
+        pclose(fp);
         fgets(res, sizeof(res)-1, fp);
 
         /// Check if brightness is a number (at least the first char)
@@ -633,7 +635,10 @@ void run_menu_loop()
             RES_HW_SCREEN_HORIZONTAL * RES_HW_SCREEN_VERTICAL * sizeof(u16));
 
     /* Stop Ampli */
-    popen(SHELL_CMD_TURN_AMPLI_OFF, "r");
+    fp = popen(SHELL_CMD_TURN_AMPLI_OFF, "r");
+    if (fp != NULL) {
+        pclose(fp);
+    }
 
     /// -------- Main loop ---------
     while (!stop_menu_loop)
@@ -713,7 +718,9 @@ void run_menu_loop()
                             fp = popen(shell_cmd, "r");
                             if (fp == NULL) {
                                 MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
-                            }
+                            } else {
+			        pclose(fp);
+			    }
 
                             /// ------ Refresh screen ------
                             screen_refresh = 1;
@@ -729,6 +736,8 @@ void run_menu_loop()
                             fp = popen(shell_cmd, "r");
                             if (fp == NULL) {
                                 MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
+                            } else {
+			        pclose(fp);
                             }
                         /// ------ Refresh screen ------
                             screen_refresh = 1;
@@ -785,6 +794,8 @@ void run_menu_loop()
                             fp = popen(shell_cmd, "r");
                             if (fp == NULL) {
                                 MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
+                            } else {
+			        pclose(fp);
                             }
                             /// ------ Refresh screen ------
                             screen_refresh = 1;
@@ -800,6 +811,8 @@ void run_menu_loop()
                             fp = popen(shell_cmd, "r");
                             if (fp == NULL) {
                                 MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
+                            } else {
+			        pclose(fp);
                             }
                             /// ------ Refresh screen ------
                             screen_refresh = 1;
@@ -861,6 +874,8 @@ void run_menu_loop()
                                 fp = popen(shell_cmd, "r");
                                 if (fp == NULL) {
                                     MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
+				} else {
+				    pclose(fp);
                                 }
 
                                 stop_menu_loop = 1;
@@ -899,6 +914,8 @@ void run_menu_loop()
                                 fp = popen(shell_cmd, "r");
                                 if (fp == NULL) {
                                     MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
+				} else {
+				    pclose(fp);
                                 }
 
                                 stop_menu_loop = 1;
@@ -995,7 +1012,10 @@ void run_menu_loop()
     }
 
     /* Start Ampli */
-    popen(SHELL_CMD_TURN_AMPLI_ON, "r");
+    fp = popen(SHELL_CMD_TURN_AMPLI_ON, "r");
+    if (fp != NULL) {
+        pclose(fp);
+    }
 
     /// ------ Reset last screen ------
     SDL_BlitSurface(backup_hw_screen, NULL, hw_screen, NULL);
@@ -1022,9 +1042,13 @@ int launch_resume_menu_loop()
     uint8_t screen_refresh = 1;
     uint8_t menu_confirmation = 0;
     int option_idx=RESUME_YES;
+    FILE *fp;
 
     /* Stop Ampli */
-    popen(SHELL_CMD_TURN_AMPLI_OFF, "r");
+    fp = popen(SHELL_CMD_TURN_AMPLI_OFF, "r");
+    if (fp != NULL) {
+        pclose(fp);
+    }
 
     /* Save prev key repeat params and set new Key repeat */
     SDL_GetKeyRepeat(&backup_key_repeat_delay, &backup_key_repeat_interval);
@@ -1193,7 +1217,10 @@ int launch_resume_menu_loop()
     }
 
     /* Start Ampli */
-    popen(SHELL_CMD_TURN_AMPLI_ON, "r");
+    fp = popen(SHELL_CMD_TURN_AMPLI_ON, "r");
+    if (fp != NULL) {
+        pclose(fp);
+    }
 
     return option_idx;
 }

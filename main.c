@@ -250,10 +250,13 @@ void init_main()
 /* Quick save and turn off the console */
 void quick_save_and_poweroff()
 {
+    FILE *fp;
+
     printf("Save Instant Play file\n");
 
     /* Send command to cancel any previously scheduled powerdown */
-    if (popen(SHELL_CMD_CANCEL_SCHED_POWERDOWN, "r") == NULL)
+    fp = popen(SHELL_CMD_CANCEL_SCHED_POWERDOWN, "r");
+    if (fp == NULL)
     {
         /* Countdown is still ticking, so better do nothing
 	   than start writing and get interrupted!
@@ -261,6 +264,7 @@ void quick_save_and_poweroff()
         printf("Failed to cancel scheduled shutdown\n");
 	exit(0);
     }
+    pclose(fp);
 
     /* Save  */
     u16 *current_screen = copy_screen();
@@ -464,6 +468,8 @@ int main(int argc, char *argv[])
     FILE *fp = popen(shell_cmd, "r");
     if (fp == NULL) {
         printf("In %s, Failed to run command %s\n", __func__, shell_cmd);
+    } else {
+        pclose(fp);
     }
 
     while(gui_action == CURSOR_NONE)
@@ -476,8 +482,9 @@ int main(int argc, char *argv[])
     fp = popen(SHELL_CMD_NOTIF_CLEAR, "r");
     if (fp == NULL) {
         printf("In %s, Failed to run command %s\n", __func__, SHELL_CMD_NOTIF_CLEAR);
+    } else {
+        pclose(fp);
     }
-
 
     debug_screen_end();
 

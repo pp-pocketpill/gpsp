@@ -829,7 +829,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
         }
         /// --- Quick load ---
         else if(event.key.keysym.sym == SDLK_F7)
@@ -849,7 +851,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
           return 1;
         }
         /// --- Volume Up ---
@@ -864,7 +868,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
 
           /// ----- Hud Msg -----
           sprintf(hud_msg, "VOLUME %d%%", volume_percentage);
@@ -882,7 +888,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
 
           /// ----- Hud Msg -----
           sprintf(hud_msg, "VOLUME %d%%", volume_percentage);
@@ -900,7 +908,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
 
           /// ----- Hud Msg -----
           sprintf(hud_msg, "BRIGHTNESS %d%%", brightness_percentage);
@@ -918,7 +928,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
 
           /// ----- Hud Msg -----
           sprintf(hud_msg, "BRIGHTNESS %d%%", brightness_percentage);
@@ -943,7 +955,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
 
           // Save config file
           configfile_save(cfg_file_rom);
@@ -967,7 +981,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
 
           // Save config file
           configfile_save(cfg_file_rom);
@@ -993,7 +1009,9 @@ u32 update_input()
           fp = popen(shell_cmd, "r");
           if (fp == NULL) {
             printf("Failed to run command %s\n", shell_cmd);
-          }
+          } else {
+	    pclose(fp);
+	  }
 
           // Save config file
           configfile_save(cfg_file_rom);
