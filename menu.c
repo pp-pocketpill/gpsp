@@ -621,7 +621,6 @@ void run_menu_loop()
     int start_scroll=0;
     uint8_t screen_refresh = 1;
     char shell_cmd[100];
-    FILE *fp;
     uint8_t menu_confirmation = 0;
     stop_menu_loop = 0;
     char fname[MAXPATHLEN];
@@ -638,10 +637,7 @@ void run_menu_loop()
             RES_HW_SCREEN_HORIZONTAL * RES_HW_SCREEN_VERTICAL * sizeof(u16));
 
     /* Stop Ampli */
-    fp = popen(SHELL_CMD_TURN_AMPLI_OFF, "r");
-    if (fp != NULL) {
-        pclose(fp);
-    }
+    system(SHELL_CMD_TURN_AMPLI_OFF);
 
     /// -------- Main loop ---------
     while (!stop_menu_loop)
@@ -718,12 +714,7 @@ void run_menu_loop()
 
                             /// ----- Shell cmd ----
                             sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);
-                            fp = popen(shell_cmd, "r");
-                            if (fp == NULL) {
-                                MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
-                            } else {
-			        pclose(fp);
-			    }
+                            system(shell_cmd);
 
                             /// ------ Refresh screen ------
                             screen_refresh = 1;
@@ -736,13 +727,9 @@ void run_menu_loop()
 
                             /// ----- Shell cmd ----
                             sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);
-                            fp = popen(shell_cmd, "r");
-                            if (fp == NULL) {
-                                MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
-                            } else {
-			        pclose(fp);
-                            }
-                        /// ------ Refresh screen ------
+                            system(shell_cmd);
+
+			    /// ------ Refresh screen ------
                             screen_refresh = 1;
                         }
                         else if(idx_menus[menuItem] == MENU_TYPE_SAVE){
@@ -794,12 +781,8 @@ void run_menu_loop()
 
                             /// ----- Shell cmd ----
                             sprintf(shell_cmd, "%s %d", SHELL_CMD_VOLUME_SET, volume_percentage);
-                            fp = popen(shell_cmd, "r");
-                            if (fp == NULL) {
-                                MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
-                            } else {
-			        pclose(fp);
-                            }
+                            system(shell_cmd);
+
                             /// ------ Refresh screen ------
                             screen_refresh = 1;
                         }
@@ -811,12 +794,8 @@ void run_menu_loop()
 
                             /// ----- Shell cmd ----
                             sprintf(shell_cmd, "%s %d", SHELL_CMD_BRIGHTNESS_SET, brightness_percentage);
-                            fp = popen(shell_cmd, "r");
-                            if (fp == NULL) {
-                                MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
-                            } else {
-			        pclose(fp);
-                            }
+                            system(shell_cmd);
+
                             /// ------ Refresh screen ------
                             screen_refresh = 1;
                         }
@@ -874,13 +853,7 @@ void run_menu_loop()
                                 /// ----- Hud Msg -----
                                 sprintf(shell_cmd, "%s %d \"        SAVED IN SLOT %d\"",
                                     SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
-                                fp = popen(shell_cmd, "r");
-                                if (fp == NULL) {
-                                    MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
-				} else {
-				    pclose(fp);
-                                }
-
+                                system(shell_cmd);
                                 stop_menu_loop = 1;
                             }
                             else{
@@ -914,13 +887,7 @@ void run_menu_loop()
                                     sprintf(shell_cmd, "%s %d \"      LOADED FROM SLOT %d\"",
                                         SHELL_CMD_NOTIF, NOTIF_SECONDS_DISP, savestate_slot+1);
                                 }
-                                fp = popen(shell_cmd, "r");
-                                if (fp == NULL) {
-                                    MENU_ERROR_PRINTF("Failed to run command %s\n", shell_cmd);
-				} else {
-				    pclose(fp);
-                                }
-
+                                system(shell_cmd);
                                 stop_menu_loop = 1;
                             }
                             else{
@@ -1018,10 +985,7 @@ void run_menu_loop()
     }
 
     /* Start Ampli */
-    fp = popen(SHELL_CMD_TURN_AMPLI_ON, "r");
-    if (fp != NULL) {
-        pclose(fp);
-    }
+    system(SHELL_CMD_TURN_AMPLI_ON);
 
     /// ------ Reset last screen ------
     SDL_BlitSurface(backup_hw_screen, NULL, hw_screen, NULL);
@@ -1048,13 +1012,9 @@ int launch_resume_menu_loop()
     uint8_t screen_refresh = 1;
     uint8_t menu_confirmation = 0;
     int option_idx=RESUME_YES;
-    FILE *fp;
 
     /* Stop Ampli */
-    fp = popen(SHELL_CMD_TURN_AMPLI_OFF, "r");
-    if (fp != NULL) {
-        pclose(fp);
-    }
+    system(SHELL_CMD_TURN_AMPLI_OFF);
 
     /* Save prev key repeat params and set new Key repeat */
     SDL_GetKeyRepeat(&backup_key_repeat_delay, &backup_key_repeat_interval);
@@ -1223,10 +1183,7 @@ int launch_resume_menu_loop()
     }
 
     /* Start Ampli */
-    fp = popen(SHELL_CMD_TURN_AMPLI_ON, "r");
-    if (fp != NULL) {
-        pclose(fp);
-    }
+    system(SHELL_CMD_TURN_AMPLI_ON);
 
     return option_idx;
 }

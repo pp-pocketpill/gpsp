@@ -465,12 +465,7 @@ int main(int argc, char *argv[])
     char shell_cmd[400];
     sprintf(shell_cmd, "%s 0 \"     BIOS FILE MISSING^^Connect your FunKey S to ^your computer and copy the^BIOS file to the GBA folder^^The file must be called:^gba_bios.bin^Size=16384 Bytes^MD5=a860e8c0b6d573d191e4ec7d^b1b1e4f6^^For more instructions:^www.funkey-project.com^^Press any button to exit...\"",
             SHELL_CMD_NOTIF);
-    FILE *fp = popen(shell_cmd, "r");
-    if (fp == NULL) {
-        printf("In %s, Failed to run command %s\n", __func__, shell_cmd);
-    } else {
-        pclose(fp);
-    }
+    system(shell_cmd);
 
     while(gui_action == CURSOR_NONE)
     {
@@ -479,12 +474,7 @@ int main(int argc, char *argv[])
     }
 
     /** Clear notif for BIOS */
-    fp = popen(SHELL_CMD_NOTIF_CLEAR, "r");
-    if (fp == NULL) {
-        printf("In %s, Failed to run command %s\n", __func__, SHELL_CMD_NOTIF_CLEAR);
-    } else {
-        pclose(fp);
-    }
+    system(SHELL_CMD_NOTIF_CLEAR);
 
     debug_screen_end();
 
