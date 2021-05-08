@@ -435,8 +435,13 @@ int main(int argc, char *argv[])
 
   sprintf(bios_filename, "%s" PATH_SEPARATOR "%s", BIOS_PATH, "gba_bios.bin");
   ret = load_bios(bios_filename);
-  if (ret != 0)
+  if (ret != 0){
     ret = load_bios("gba_bios.bin");
+  }
+  if (ret != 0){
+    sprintf(bios_filename, "%s/%s", mRomPath, "bios/gba_bios.bin");
+    ret = load_bios(bios_filename);
+  }
   if (ret != 0)
   {
     gui_action_type gui_action = CURSOR_NONE;
@@ -463,7 +468,7 @@ int main(int argc, char *argv[])
 
     /** Set notif for BIOS */
     char shell_cmd[400];
-    sprintf(shell_cmd, "%s 0 \"     BIOS FILE MISSING^^Connect your FunKey S to ^your computer and copy the^BIOS file to the GBA folder^^The file must be called:^gba_bios.bin^Size=16384 Bytes^MD5=a860e8c0b6d573d191e4ec7d^b1b1e4f6^^For more instructions:^www.funkey-project.com^^Press any button to exit...\"",
+    sprintf(shell_cmd, "%s 0 \"     BIOS FILE MISSING^^Connect your FunKey S to ^your computer and copy the^BIOS file to the folder:^   Game Boy Advance/bios/^^The file must be called:^gba_bios.bin^Size=16384 Bytes^MD5=a860e8c0b6d573d191e4ec7d^b1b1e4f6^^For more instructions:^www.funkey-project.com^^Press any button to exit...\"",
             SHELL_CMD_NOTIF);
     system(shell_cmd);
 
