@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
     /** Set notif for BIOS */
     char shell_cmd[400];
     sprintf(shell_cmd, "%s 0 \"     BIOS FILE MISSING^^Connect your FunKey S to ^your computer and copy the^BIOS file to the folder:^   Game Boy Advance/bios/^^The file must be called:^gba_bios.bin^Size=16384 Bytes^MD5=a860e8c0b6d573d191e4ec7d^b1b1e4f6^^For more instructions:^www.funkey-project.com^^Press any button to exit...\"",
-            SHELL_CMD_NOTIF);
+            SHELL_CMD_NOTIF_SET);
     system(shell_cmd);
 
     while(gui_action == CURSOR_NONE)
