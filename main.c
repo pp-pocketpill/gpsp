@@ -740,12 +740,12 @@ u32 update_gba()
 
     reg[CHANGED_PC_STATUS] = 0;
 
-    if(gbc_sound_update)
+    /*if(gbc_sound_update)
     {
       gbc_update_count++;
       update_gbc_sound(cpu_ticks);
       gbc_sound_update = 0;
-    }
+    }*/
 
     update_timer(0);
     update_timer(1);
@@ -849,12 +849,12 @@ u32 update_gba()
             mQuickSaveAndPoweroff = 0;
           }
 
-          update_gbc_sound(cpu_ticks);
+          //update_gbc_sound(cpu_ticks);
 
           /// ------- Render -------
           update_screen();
 
-          if(!print_hud()){
+          /*if(!print_hud()){
             if(fps_debug)
             {
               char print_buffer[32];
@@ -863,7 +863,7 @@ u32 update_gba()
             }
           }
           if(!synchronize_flag)
-            print_string("-FF-", 0xFFFF, 0x000, 216, 0);
+            print_string("-FF-", 0xFFFF, 0x000, 216, 0);*/
 
           flip_screen();
           /// ----------------------
@@ -873,7 +873,7 @@ u32 update_gba()
           if(update_backup_flag)
             update_backup();
 
-          process_cheats();
+          //process_cheats();
 
           event_cycles++;
           if(event_cycles == event_cycles_trigger)

@@ -174,6 +174,7 @@ SDL_Surface *hw_screen = NULL;
 #endif
 SDL_Surface *screen = NULL;
 SDL_Surface *virtual_hw_screen = NULL;
+SDL_Rect screenRect, gbaRect;
 
 const u32 video_scale = 1;
 
@@ -3877,7 +3878,8 @@ void render_game()
     prev_aspect_ratio = aspect_ratio;
     need_screen_cleared = 0;
   }
-
+  memcpy(hw_screen->pixels + (40 * hw_screen->pitch), screen->pixels, 159 * hw_screen->pitch + 240 * hw_screen->format->BytesPerPixel);
+  #if (0)
   switch(aspect_ratio){
     case ASPECT_RATIOS_TYPE_STRETCHED:
     if(screen->w > RES_HW_SCREEN_HORIZONTAL){
@@ -3946,6 +3948,7 @@ void render_game()
         RES_HW_SCREEN_HORIZONTAL, RES_HW_SCREEN_VERTICAL);
     break;
   }
+  #endif
 }
 
 
@@ -3985,6 +3988,15 @@ void init_video()
   if (screen)
     SDL_FreeSurface(screen);
   screen = SDL_CreateRGBSurface(SDL_SWSURFACE, GBA_SCREEN_WIDTH, GBA_SCREEN_HEIGHT, 16, 0xFFFF, 0xFFFF, 0xFFFF, 0);
+
+  screenRect.x = 0;
+  screenRect.y = 40;
+  screenRect.w = 240;
+  screenRect.h = 160;
+  gbaRect.x = 0;
+  gbaRect.y = 0;
+  gbaRect.w = 240;
+  gbaRect.h = 160;
 
   SDL_ShowCursor(0);
 }
@@ -4328,6 +4340,9 @@ void blit_to_screen(u16 *src, u32 w, u32 h, u32 dest_x, u32 dest_y)
   u16 *src_ptr = src;
   s32 x, y;
 
+  memcpy(screen->pixels, src, (w * h * pitch));
+  printf("BLIT?\n");
+  /*
   for(y = 0; y < h; y++)
   {
     for(x = 0; x < w1; x++)
@@ -4337,6 +4352,7 @@ void blit_to_screen(u16 *src, u32 w, u32 h, u32 dest_x, u32 dest_y)
     src_ptr += w;
     dest_ptr += pitch;
   }
+  */
 }
 
 /*void print_string_ext(const char *str, u16 fg_color, u16 bg_color,

@@ -4,21 +4,21 @@
 
 # Global definitions
 
-CC        = $(CROSS_COMPILE)-gcc
+CC        = $(CROSS_COMPILE)gcc
 
 OBJS      = chip.o main.o menu.o cpu.o memory.o video.o input.o sound.o gui.o \
             cheats.o zip.o cpu_threaded.o arm_stub.o video_blend.o warm.o \
-            upscale_aspect.o neon_scaler.o configfile_fk.o
+            upscale_aspect.o configfile_fk.o
 BIN       = gpsp
 
 # Platform specific definitions 
 
 VPATH      += .. ../arm ../gp2x
 CFLAGS     += -DARM_ARCH -DCHIP_BUILD -Wall
-CFLAGS     += -march=armv7-a -mtune=cortex-a7 -mfloat-abi=hard -mfpu=neon -ffast-math
+CFLAGS     += -ffast-math
 CFLAGS     += -ggdb
 ifndef DEBUG
-CFLAGS     += -O3 -funsafe-math-optimizations -mvectorize-with-neon-quad -ftree-vectorize
+CFLAGS     += -O3 -funsafe-math-optimizations -ftree-vectorize
 endif
 
 # expecting to have PATH set up to get correct sdl-config first
@@ -37,8 +37,8 @@ all:	$(BIN)
 %.o: %.s
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-main.o: CFLAGS += -marm
-cpu.o cpu_threaded.o video.o: CFLAGS += -marm -Wno-unused-variable -Wno-unused-label -fprefetch-loop-arrays
+main.o:
+cpu.o cpu_threaded.o video.o: CFLAGS += -Wno-unused-variable -Wno-unused-label -fprefetch-loop-arrays
 
 $(BIN): $(OBJS)
 	$(CC) $(OBJS) $(LIBS) -o $(BIN)

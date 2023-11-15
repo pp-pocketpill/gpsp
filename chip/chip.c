@@ -19,11 +19,6 @@
 
 #include "../common.h"
 
-#include "../arm/neon_scale2x.h"
-#include "../arm/neon_scale3x.h"
-#include "../arm/neon_eagle2x.h"
-
-
 u32 gamepad_config_map[PLAT_BUTTON_COUNT] =
 {
   BUTTON_ID_UP,                 // Up

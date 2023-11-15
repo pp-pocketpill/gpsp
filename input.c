@@ -566,28 +566,28 @@ u32 key_map(SDLKey key_sym)
 {
   switch(key_sym)
   {
-    case SDLK_m:
+    case SDLK_y:
       return BUTTON_L;
 
-    case SDLK_n:
+    case SDLK_x:
       return BUTTON_R;
 
-    case SDLK_d:
+    case SDLK_DOWN:
       return BUTTON_DOWN;
 
-    case SDLK_u:
+    case SDLK_UP:
       return BUTTON_UP;
 
-    case SDLK_l:
+    case SDLK_LEFT:
       return BUTTON_LEFT;
 
-    case SDLK_r:
+    case SDLK_RIGHT:
       return BUTTON_RIGHT;
 
-    case SDLK_s:
+    case SDLK_RETURN:
       return BUTTON_START;
 
-    case SDLK_k:
+    case SDLK_SPACE:
       return BUTTON_SELECT;
 
     case SDLK_b:
@@ -595,12 +595,6 @@ u32 key_map(SDLKey key_sym)
 
     case SDLK_a:
       return BUTTON_A;
-
-    case SDLK_y:
-      return BUTTON_A;
-
-    case SDLK_x:
-      return BUTTON_B;
 
     default:
       return BUTTON_NONE;
